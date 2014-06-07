@@ -5,9 +5,8 @@ from tkinter import simpledialog
 import ipdb  # noqa
 
 
-class HeroImageSelectList(simpledialog.Dialog):
+class HeroImageWithList(simpledialog.Dialog):
     data = []
-    suggested = None
     result = None
     __image = None
     mtitle = None

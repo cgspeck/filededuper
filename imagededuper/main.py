@@ -14,6 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from . import scanfiles
 from . import models
 from . import printpopularitylist
+from . import dedupeselector
 
 def connect_to_db(URI):
     #engine = create_engine('sqlite:///images.sqlite3', echo=False)
@@ -48,7 +49,9 @@ def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)
     default_db = 'sqlite:///images.db'
-    parser = argparse.ArgumentParser(description='Image file deduper')
+    parser = argparse.ArgumentParser(description='USE AT YOUR OWN RISK AND '
+        'ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE WILL ERASE '
+        'NON-SELECTED FILES.')
     function_group = parser.add_mutually_exclusive_group()
     function_group.add_argument(
         '--scan', '-s', action='store_true',
@@ -64,8 +67,11 @@ def main():  # pragma: no cover
     parser.add_argument('folder',  nargs='?', default=os.getcwd(),
         help='Folder to scan')
 
-    parser.set_defaults(scan=True)
+    #parser.set_defaults(scan=True)
     args = parser.parse_args()
+
+    if not (args.printlist or args.dedupe or args.scan):
+        parser.print_help()
 
     engine, session = connect_to_db(args.db)
     models.create_tables(engine)
@@ -73,13 +79,14 @@ def main():  # pragma: no cover
     if args.printlist:
         printpopularitylist.PrintPopularityList(session, args.printlist)
     elif args.dedupe:
-        pass
+        dedupeselector.GraphicalDedupe(session)
     elif args.scan:
-        if not args.folder:
+        if args.folder:
+            scanfiles.ScanFiles(session, args.folder)
+        else:
             print('Must supply a folder to scan')
-            sys.exit()
 
-        scanfiles.ScanFiles(args.folder, session)        
+    session.close()
 
 
 if __name__ == '__main__':  # pragma: no cover

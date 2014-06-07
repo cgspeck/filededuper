@@ -9,7 +9,7 @@ Base = declarative_base()
 
 from .models import ImageFile
 
-def FileRecordExists(fullpath, session):
+def FileRecordExists(session, fullpath):
     query = session.query(ImageFile).filter(ImageFile.fullpath.like(fullpath))
     return not (query.first() is None)
 
@@ -25,12 +25,12 @@ def HashFile(fullpath, blocksize=65536):
     return hasher.hexdigest()
 
 
-def ScanFiles(FOLDER, session):
+def ScanFiles(session, FOLDER):
     for root, dirs, files in os.walk(FOLDER):
         for count, filename in enumerate(files):
             fullpath = os.path.join(root, filename)
 
-            if FileRecordExists(fullpath, session):
+            if FileRecordExists(session, fullpath):
                 print('{count} of {length}: Skipping {filename}'.format(
                     count=count, length=len(files), filename=filename))
             else:
