@@ -15,3 +15,6 @@ class ImageFile(Base):
     def __repr__(self):
         rs = "<ImageFile(name='%s', fullpath='%s', filehash='%s', keep='%s')>"
         return rs % (self.name, self.fullpath, self.filehash, self.keep)
+
+def create_tables(engine):
+    Base.metadata.create_all(engine)

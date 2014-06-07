@@ -12,11 +12,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from . import scanfiles
+from . import models
+from . import printpopularitylist
 
-def connect_to_db():
-    engine = create_engine('sqlite:///images.sqlite3', echo=False)
+def connect_to_db(URI):
+    #engine = create_engine('sqlite:///images.sqlite3', echo=False)
+    engine = create_engine(URI, echo=False)
     Session = sessionmaker(bind=engine)
-    return Session()
+    return engine, Session()
 
 def setup_logging():    # pragma: no cover
     log_format = '%(asctime)s:%(levelname)s:%(filename)s(%(lineno)d) ' \
@@ -44,29 +47,31 @@ def silly_function():
 def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)
+    default_db = 'sqlite:///images.db'
     parser = argparse.ArgumentParser(description='Image file deduper')
     function_group = parser.add_mutually_exclusive_group()
     function_group.add_argument(
         '--scan', '-s', action='store_true',
         help='Scan given folder for image files and store hash')
     function_group.add_argument(
-        '--printlist', '-p', action='store_true',
-        help='Print duplicate hashes, count and file list')
+        '--printlist', '-p', choices=['csv', 'json'],
+        help='Print duplicate count, suggestion (csv) and file list (json)')
     function_group.add_argument(
         '--dedupe', '-d', action='store_true',
         help='Interactively prompt to delete duplicate files')
-    parser.add_argument('-db', '--db', default='sqlite:////~/dupeimages.db',
-        help='Database URI, e.g. sqlite:////home/user/images.db')
+    parser.add_argument('--db', default=default_db,
+        help='Database URI, e.g. {0}'.format(default_db))
     parser.add_argument('folder',  nargs='?', default=os.getcwd(),
         help='Folder to scan')
 
     parser.set_defaults(scan=True)
     args = parser.parse_args()
 
-    session = connect_to_db()
+    engine, session = connect_to_db(args.db)
+    models.create_tables(engine)
 
     if args.printlist:
-        pass
+        printpopularitylist.PrintPopularityList(session, args.printlist)
     elif args.dedupe:
         pass
     elif args.scan:
