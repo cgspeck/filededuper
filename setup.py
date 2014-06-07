@@ -8,5 +8,8 @@ setup(name='Image File Deduper',
       author_email='chris@chrisspeck.com',
       url='http://www.chrisspeck.com/',
       packages=['imagededuper'],
-      scripts=['scripts/imagededuper']
+      scripts=['scripts/imagededuper'],
+      install_requires=['ipdb',
+        'sqlalchemy',
+        'pillow']
      )
