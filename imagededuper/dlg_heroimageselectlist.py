@@ -5,7 +5,7 @@ from tkinter import simpledialog
 import ipdb  # noqa
 
 
-class HeroCheckboxList(simpledialog.Dialog):
+class HeroImageSelectList(simpledialog.Dialog):
     data = []
     suggested = None
     result = None
