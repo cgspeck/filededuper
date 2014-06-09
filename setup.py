@@ -11,5 +11,7 @@ setup(name='Image File Deduper',
       scripts=['scripts/imagededuper'],
       install_requires=['ipdb',
         'sqlalchemy',
-        'pillow']
+        'pillow'],
+      test_requires=['pytest', 'fudge'],
+      #test_suite=['nose.collector']
      )
