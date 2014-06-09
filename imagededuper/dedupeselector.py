@@ -9,6 +9,7 @@ from .printpopularitylist import get_data
 from .models import ImageFile
 from .dialogs import HeroImageWithList
 
+
 def GraphicalDedupe(session):
     tk_root = tkinter.Tk()
     tk_root.withdraw()

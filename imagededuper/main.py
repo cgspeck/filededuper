@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import functools
 import datetime
 import time
 import signal
@@ -16,17 +15,19 @@ from . import models
 from . import printpopularitylist
 from . import dedupeselector
 
+
 def connect_to_db(URI):
-    #engine = create_engine('sqlite:///images.sqlite3', echo=False)
     engine = create_engine(URI, echo=False)
     Session = sessionmaker(bind=engine)
     return engine, Session()
+
 
 def setup_logging():    # pragma: no cover
     log_format = '%(asctime)s:%(levelname)s:%(filename)s(%(lineno)d) ' \
         '%(message)s'
     log_level = logging.DEBUG
     logging.basicConfig(format=log_format, level=log_level)
+
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
@@ -40,10 +41,12 @@ def signal_handler(signal, frame):
             insp = frame.f_back
     sys.exit(0)
 
+
 def silly_function():
     while True:
         print(datetime.datetime.now())
         time.sleep(1)
+
 
 def main():  # pragma: no cover
     setup_logging()
@@ -64,10 +67,9 @@ def main():  # pragma: no cover
         help='Interactively prompt to delete duplicate files')
     parser.add_argument('--db', default=default_db,
         help='Database URI, e.g. {0}'.format(default_db))
-    parser.add_argument('folder',  nargs='?', default=os.getcwd(),
+    parser.add_argument('folder', nargs='?', default=os.getcwd(),
         help='Folder to scan')
 
-    #parser.set_defaults(scan=True)
     args = parser.parse_args()
 
     if not (args.printlist or args.dedupe or args.scan):

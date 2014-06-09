@@ -16,7 +16,6 @@ class Util(object):
         hasher = hashlib.sha256()
         afile = open(fullpath, 'rb')
         buf = afile.read(blocksize)
-        #from ipdb import set_trace; set_trace()
         while len(buf) > 0:
             hasher.update(buf)
             buf = afile.read(blocksize)

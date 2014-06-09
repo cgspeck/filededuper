@@ -1,14 +1,6 @@
 import builtins
-import os
-import pytest
 import fudge
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from imagededuper import models
-from imagededuper.models import ImageFile
-from imagededuper import scanfiles
 from imagededuper.util import Util
 
 
@@ -33,4 +25,3 @@ def test_hash_file(monkeypatch):
 
     assert "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" \
         == Util.hash_file('/a/folder/0.ext')
-

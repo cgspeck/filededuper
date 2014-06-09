@@ -10,8 +10,8 @@ def get_data(session):
     results = []
 
     qry = session.query(ImageFile.filehash,
-    func.count('*').label('hash_count'))\
-    .group_by(ImageFile.filehash).having(func.count('*') > 1)
+        func.count('*').label('hash_count'))\
+        .group_by(ImageFile.filehash).having(func.count('*') > 1)
 
     for filehash, count in session.query(ImageFile.filehash, func.count('*')
             .label('hash_count')).group_by(ImageFile.filehash)\
@@ -22,7 +22,6 @@ def get_data(session):
             .filter(ImageFile.filehash == filehash)
         assert qry.count() == count
         max_len = 0
-        result_to_keep = None
 
         files = []
         keep_suggestion = None
@@ -44,7 +43,6 @@ def get_data(session):
     return results
 
 
-
 def PrintPopularityList(session, mode):
     results = get_data(session)
     if mode == 'csv':
@@ -55,4 +53,3 @@ def PrintPopularityList(session, mode):
     else:
             # pretty print the json objects
             pprint.pprint(results)
-
