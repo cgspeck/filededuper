@@ -14,7 +14,6 @@ class Util(object):
 
     @staticmethod
     def hash_file(fullpath, blocksize=65536):
-        print('!' * 20)
         hasher = hashlib.sha256()
         afile = open(fullpath, 'rb')
         buf = afile.read(blocksize)

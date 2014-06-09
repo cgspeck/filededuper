@@ -3,19 +3,17 @@ import pprint
 
 import tkinter
 
-from ipdb import set_trace  # noqa
-
 from .models import ImageFile
-from .dialogs import HeroImageWithList
-from .util import Util
+from . import dialogs
+from . import util
 
 
 def GraphicalDedupe(session):
     tk_root = tkinter.Tk()
     tk_root.withdraw()
-    dlg = HeroImageWithList(tk_root)
+    dlg = dialogs.HeroImageWithList(tk_root)
 
-    dupes = Util.get_data(session)
+    dupes = util.Util.get_data(session)
 
     if len(dupes) == 0:
         print('No duplicate files detected')
@@ -41,26 +39,28 @@ def GraphicalDedupe(session):
         dlg.data = dialog_list
         dlg.mtitle = "Please select the file you would like to keep"
         dlg.window_init()
-        if not dlg.result:
+
+        result = dlg.get_result()
+        if not result:
             print('No image selected to keep or cancel pressed')
             break
 
-        selected_keeper = dupe['files'][dlg.result[0]]
+        print(result)
 
+        selected_keeper = dupe['files'][result[0]]
         assert selected_keeper is not None
         assert os.path.exists(selected_keeper['fullpath'])
-
         pprint.pprint('Will retain {0}'.format(selected_keeper))
 
         for candidate_file in dupe['files']:
             if candidate_file['id'] != selected_keeper['id']:
                 try:
                     print('Deleting {0}'.format(candidate_file['fullpath']))
-
+                    os.remove(candidate_file['fullpath'])
                 except Exception:
+                    print('Unable to delete file!!')
+                    session.close()
                     raise
-                finally:
-                    pass
             else:
                 print('Keeping {name}'
                     .format(name=candidate_file['name']))

@@ -2,7 +2,6 @@ import tkinter
 # from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import simpledialog
-import ipdb  # noqa
 
 
 class HeroImageWithList(simpledialog.Dialog):
@@ -128,3 +127,6 @@ class HeroImageWithList(simpledialog.Dialog):
 
         self.bind("<Return>", self.ok)
         self.bind("<Escape>", self.cancel)
+
+    def get_result(self):
+        return self.result

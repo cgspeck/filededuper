@@ -13,5 +13,5 @@ setup(name='Image File Deduper',
     'sqlalchemy',
     'pillow'],
     test_requires=['pytest', 'fudge'],
-    test_suite=['test']
+    test_suite='test'
       )
