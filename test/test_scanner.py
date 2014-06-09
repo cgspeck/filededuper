@@ -23,8 +23,7 @@ def test_session(request):
     return session
 
 
-def test_scanner(test_session, monkeypatch):
-
+def test_scanner_happy_path(test_session, monkeypatch):
     fake_walk = (fudge.Fake('walk').expects_call()
         .with_args('/a/folder')
         .returns([('/a/folder', [],
@@ -58,3 +57,26 @@ def test_scanner(test_session, monkeypatch):
             ImageFile.fullpath == '/a/folder/{0}.ext'.format(i)
         )
         assert qry.count() == 1
+
+
+def test_scanner_does_not_readd_files(test_session, monkeypatch):
+    new_file = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
+                    filehash='hash0')
+    test_session.add(new_file)
+    test_session.commit()
+
+    fake_walk = (fudge.Fake('walk').expects_call()
+        .with_args('/a/folder')
+        .returns([('/a/folder', [],
+        ['{0}.ext'.format(num) for num in range(1)])]))
+
+    monkeypatch.setattr(os, "walk", fake_walk)
+
+    fake_hash_file = (fudge.Fake('hash_file'))
+    monkeypatch.setattr(Util, "hash_file", fake_hash_file)
+
+    scanfiles.ScanFiles(test_session, '/a/folder')
+
+    qry = test_session.query(ImageFile)
+
+    assert qry.count() == 1
