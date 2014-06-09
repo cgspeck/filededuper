@@ -23,6 +23,7 @@ def test_session(request):
     return session
 
 
+@fudge.test
 def test_scanner_happy_path(test_session, monkeypatch):
     fake_walk = (fudge.Fake('walk').expects_call()
         .with_args('/a/folder')
@@ -59,6 +60,7 @@ def test_scanner_happy_path(test_session, monkeypatch):
         assert qry.count() == 1
 
 
+@fudge.test
 def test_scanner_does_not_readd_files(test_session, monkeypatch):
     new_file = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
                     filehash='hash0')
