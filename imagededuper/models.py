@@ -10,11 +10,10 @@ class ImageFile(Base):
     name = Column(String)
     fullpath = Column(String)
     filehash = Column(String)
-    keep = Column(Boolean)
 
     def __repr__(self):
-        rs = "<ImageFile(name='%s', fullpath='%s', filehash='%s', keep='%s')>"
-        return rs % (self.name, self.fullpath, self.filehash, self.keep)
+        rs = "<ImageFile(name='%s', fullpath='%s', filehash='%s')>"
+        return rs % (self.name, self.fullpath, self.filehash)
 
 def create_tables(engine):
     Base.metadata.create_all(engine)
