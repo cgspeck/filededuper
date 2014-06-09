@@ -12,19 +12,19 @@ from .util import Util
 
 
 def ScanFiles(session, FOLDER):
-    u = Util()
+    ut = Util()
     for root, dirs, files in os.walk(FOLDER):
         for count, filename in enumerate(files):
             fullpath = os.path.join(root, filename)
 
-            if u.FileRecordExists(session, fullpath):
+            if ut.FileRecordExists(session, fullpath):
                 print('{count} of {length}: Skipping {filename}'.format(
                     count=count, length=len(files), filename=filename))
             else:
                 print('{count} of {length}: Processing {filename}'.format(
                     count=count, length=len(files), filename=filename))
                 new_file = ImageFile(name=filename, fullpath=fullpath,
-                    filehash=u.HashFile(fullpath), keep=False)
+                    filehash=ut.HashFile(fullpath), keep=False)
                 session.add(new_file)
                 session.commit()
 
