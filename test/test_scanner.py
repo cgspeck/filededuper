@@ -12,7 +12,7 @@ from imagededuper.util import Util
 
 
 @pytest.fixture(scope='function')
-def test_session(request):
+def db_session(request):
     engine = create_engine('sqlite:///:memory:', echo=True)
     session = sessionmaker(bind=engine)()
     models.Base.metadata.create_all(engine)
@@ -24,7 +24,7 @@ def test_session(request):
 
 
 @fudge.test
-def test_scanner_happy_path(test_session, monkeypatch):
+def test_scanner_happy_path(db_session, monkeypatch):
     fake_walk = (fudge.Fake('walk').expects_call()
         .with_args('/a/folder')
         .returns([('/a/folder', [],
@@ -45,14 +45,14 @@ def test_scanner_happy_path(test_session, monkeypatch):
                       )
 
     monkeypatch.setattr(Util, "hash_file", fake_hash_file)
-    scanfiles.ScanFiles(test_session, '/a/folder')
+    scanfiles.ScanFiles(db_session, '/a/folder')
 
-    qry = test_session.query(ImageFile)
+    qry = db_session.query(ImageFile)
 
     assert qry.count() == 3
 
     for i in range(3):
-        qry = test_session.query(ImageFile).filter(
+        qry = db_session.query(ImageFile).filter(
             ImageFile.filehash == 'HASH{0}'.format(i),
             ImageFile.name == '{0}.ext'.format(i),
             ImageFile.fullpath == '/a/folder/{0}.ext'.format(i)
@@ -61,11 +61,11 @@ def test_scanner_happy_path(test_session, monkeypatch):
 
 
 @fudge.test
-def test_scanner_does_not_readd_files(test_session, monkeypatch):
+def test_scanner_does_not_readd_files(db_session, monkeypatch):
     new_file = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
                     filehash='hash0')
-    test_session.add(new_file)
-    test_session.commit()
+    db_session.add(new_file)
+    db_session.commit()
 
     fake_walk = (fudge.Fake('walk').expects_call()
         .with_args('/a/folder')
@@ -77,8 +77,8 @@ def test_scanner_does_not_readd_files(test_session, monkeypatch):
     fake_hash_file = (fudge.Fake('hash_file'))
     monkeypatch.setattr(Util, "hash_file", fake_hash_file)
 
-    scanfiles.ScanFiles(test_session, '/a/folder')
+    scanfiles.ScanFiles(db_session, '/a/folder')
 
-    qry = test_session.query(ImageFile)
+    qry = db_session.query(ImageFile)
 
     assert qry.count() == 1

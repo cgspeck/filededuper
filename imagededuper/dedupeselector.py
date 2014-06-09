@@ -5,9 +5,9 @@ import tkinter
 
 from ipdb import set_trace  # noqa
 
-from .printpopularitylist import get_data
 from .models import ImageFile
 from .dialogs import HeroImageWithList
+from .util import Util
 
 
 def GraphicalDedupe(session):
@@ -15,7 +15,7 @@ def GraphicalDedupe(session):
     tk_root.withdraw()
     dlg = HeroImageWithList(tk_root)
 
-    dupes = get_data(session)
+    dupes = Util.get_data(session)
 
     if len(dupes) == 0:
         print('No duplicate files detected')
