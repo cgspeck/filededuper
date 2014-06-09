@@ -24,7 +24,7 @@ class Util(object):
         return hasher.hexdigest()
 
     @staticmethod
-    def get_data(session):
+    def get_data(session, longest=True):
         results = []
 
         qry = session.query(ImageFile.filehash,
@@ -48,9 +48,20 @@ class Util(object):
             for result in qry:
                 files.append(dict(name=result.name, fullpath=result.fullpath,
                     id=result.id))
-                if result.namelen > max_len:
+
+                if keep_suggestion is None:
                     keep_suggestion = result
                     max_len = result.namelen
+
+                if longest:
+                    if result.namelen > max_len:
+                        keep_suggestion = result
+                        max_len = result.namelen
+                else:
+                    if result.namelen < max_len:
+                        keep_suggestion = result
+                        max_len = result.namelen
+
             # make sure we have set a file to save
             assert keep_suggestion
             keep_suggestion = dict(name=keep_suggestion.name,

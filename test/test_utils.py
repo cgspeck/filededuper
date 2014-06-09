@@ -77,3 +77,53 @@ def test_get_data(db_session):
     actual = Util.get_data(db_session)
 
     assert expected == actual
+
+
+def test_get_data_shortest(db_session):
+    # returns a json dict of files with matching hashes in groups
+    unique_file_1 = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
+                    filehash='hash0')
+    unique_file_2 = ImageFile(name='1.ext', fullpath='/a/folder/1.ext',
+                    filehash='hash1')
+    common_file_1a = ImageFile(name='cf1.ext', fullpath='/a/folder/cf1.ext',
+                    filehash='cf1')
+    common_file_1b = ImageFile(name='cf1b.ext', fullpath='/a/folder/cf1b.ext',
+                    filehash='cf1')
+    common_file_1c = ImageFile(name='cf1cx.ext',
+        fullpath='/a/folder/cf1cx.ext', filehash='cf1')
+    common_file_2a = ImageFile(name='cf2a.ext',
+        fullpath='/a/folder/cf2a.ext', filehash='cf2')
+    common_file_2b = ImageFile(name='cf2.ext',
+        fullpath='/a/folder/cf2.ext', filehash='cf2')
+    common_file_2c = ImageFile(name='cf2c.ext', fullpath='/a/folder/cf2c.ext',
+                    filehash='cf2')
+    db_session.add(unique_file_1)
+    db_session.add(unique_file_2)
+    db_session.add(common_file_1a)
+    db_session.add(common_file_1b)
+    db_session.add(common_file_1c)
+    db_session.add(common_file_2a)
+    db_session.add(common_file_2b)
+    db_session.add(common_file_2c)
+    db_session.commit()
+
+    expected = [
+        {'hash': 'cf1', 'count': 3, 'files': [
+            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3},
+            {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
+            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
+        'keep_suggestion':
+            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3}
+         },
+        {'hash': 'cf2', 'count': 3, 'files': [
+            {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
+            {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7},
+            {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
+        'keep_suggestion':
+            {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7}
+         }
+    ]
+
+    actual = Util.get_data(db_session, longest=False)
+
+    assert expected == actual
