@@ -9,19 +9,18 @@ from .util import Util
 
 
 def ScanFiles(session, FOLDER):
-    ut = Util()
     for root, dirs, files in os.walk(FOLDER):
         for count, filename in enumerate(files):
             fullpath = os.path.join(root, filename)
 
-            if ut.file_record_exists(session, fullpath):
+            if Util.file_record_exists(session, fullpath):
                 print('{count} of {length}: Skipping {filename}'.format(
                     count=count, length=len(files), filename=filename))
             else:
                 print('{count} of {length}: Processing {filename}'.format(
                     count=count, length=len(files), filename=filename))
                 new_file = ImageFile(name=filename, fullpath=fullpath,
-                    filehash=ut.hash_file(fullpath))
+                    filehash=Util.hash_file(fullpath))
                 session.add(new_file)
                 session.commit()
 
