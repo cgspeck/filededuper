@@ -1,26 +1,9 @@
 import os
-import pytest
 import fudge
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from imagededuper import models
 from imagededuper.models import ImageFile
 from imagededuper import scanfiles
 from imagededuper.util import Util
-
-
-@pytest.fixture(scope='function')
-def db_session(request):
-    engine = create_engine('sqlite:///:memory:', echo=True)
-    session = sessionmaker(bind=engine)()
-    models.Base.metadata.create_all(engine)
-
-    def fin():
-        models.Base.metadata.drop_all(engine)
-    request.addfinalizer(fin)
-    return session
 
 
 @fudge.test

@@ -1,7 +1,6 @@
 import builtins
 
 import fudge
-import pytest
 
 from imagededuper.util import Util
 from imagededuper.models import ImageFile
@@ -40,13 +39,13 @@ def test_get_data(db_session):
                     filehash='cf1')
     common_file_1b = ImageFile(name='cf1b.ext', fullpath='/a/folder/cf1b.ext',
                     filehash='cf1')
-    common_file_1c = ImageFile(name='cf1c.ext', fullpath='/a/folder/cf1cx.ext',
-                    filehash='cf1')
-    common_file_2a = ImageFile(name='cf2a.ext', fullpath='/a/folder/cf2a.ext',
-                    filehash='cf2')
-    common_file_2b = ImageFile(name='cf2b.ext', fullpath='/a/folder/cf2b.ext',
-                    filehash='cf2')
-    common_file_2c = ImageFile(name='cf2c.ext', fullpath='/a/folder/cf2cx.ext',
+    common_file_1c = ImageFile(name='cf1cx.ext',
+        fullpath='/a/folder/cf1cx.ext', filehash='cf1')
+    common_file_2a = ImageFile(name='cf2a.ext',
+        fullpath='/a/folder/cf2a.ext', filehash='cf2')
+    common_file_2b = ImageFile(name='cf2bx.ext',
+        fullpath='/a/folder/cf2bx.ext', filehash='cf2')
+    common_file_2c = ImageFile(name='cf2c.ext', fullpath='/a/folder/cf2c.ext',
                     filehash='cf2')
     db_session.add(unique_file_1)
     db_session.add(unique_file_2)
@@ -55,6 +54,26 @@ def test_get_data(db_session):
     db_session.add(common_file_1c)
     db_session.add(common_file_2a)
     db_session.add(common_file_2b)
-    db_session.add(common_file_2c)    
+    db_session.add(common_file_2c)
     db_session.commit()
-    print(Util.get_data(db_session))
+
+    expected = [
+        {'hash': 'cf1', 'count': 3, 'files': [
+            {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
+            {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
+            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
+        'keep_suggestion':
+            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+         },
+        {'hash': 'cf2', 'count': 3, 'files': [
+            {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
+            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
+            {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
+        'keep_suggestion':
+            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+         }
+    ]
+
+    actual = Util.get_data(db_session)
+
+    assert expected == actual

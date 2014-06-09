@@ -32,9 +32,10 @@ class Util(object):
             func.count('*').label('hash_count'))\
             .group_by(ImageFile.filehash).having(func.count('*') > 1)
 
-        for filehash, count in session.query(ImageFile.filehash, func.count('*')
-                .label('hash_count')).group_by(ImageFile.filehash)\
-                .having(func.count('*') > 1).order_by('hash_count desc'):
+        for filehash, count in session.query(ImageFile.filehash,
+                func.count('*').label('hash_count'))\
+                .group_by(ImageFile.filehash).having(func.count('*') > 1)\
+                .order_by('hash_count desc'):
             qry = session.query(ImageFile.id, ImageFile.name,
                 ImageFile.fullpath,
                 func.char_length(ImageFile.name).label('namelen'))\

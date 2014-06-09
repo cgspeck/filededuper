@@ -1,6 +1,5 @@
 import pprint
 
-from .models import ImageFile
 from .util import Util
 
 
