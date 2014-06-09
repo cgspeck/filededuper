@@ -17,14 +17,14 @@ def ScanFiles(session, FOLDER):
         for count, filename in enumerate(files):
             fullpath = os.path.join(root, filename)
 
-            if ut.FileRecordExists(session, fullpath):
+            if ut.file_record_exists(session, fullpath):
                 print('{count} of {length}: Skipping {filename}'.format(
                     count=count, length=len(files), filename=filename))
             else:
                 print('{count} of {length}: Processing {filename}'.format(
                     count=count, length=len(files), filename=filename))
                 new_file = ImageFile(name=filename, fullpath=fullpath,
-                    filehash=ut.HashFile(fullpath), keep=False)
+                    filehash=ut.hash_file(fullpath))
                 session.add(new_file)
                 session.commit()
 
