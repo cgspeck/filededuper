@@ -1,12 +1,12 @@
 from .models import ImageFile
 
 class Util(object):
-    def FileRecordExists(self, session, fullpath):
+    def file_record_exists(self, session, fullpath):
         query = session.query(ImageFile).filter(ImageFile.fullpath.like(fullpath))
         return not (query.first() is None)
 
 
-    def HashFile(self, fullpath, blocksize=65536):
+    def hash_file(self, fullpath, blocksize=65536):
         print('!' * 20)
         hasher = hashlib.sha256()
         afile = open(fullpath, 'rb')
