@@ -3,9 +3,9 @@ import pprint
 from .util import Util
 
 
-def PrintPopularityList(session, mode):
+def PrintPopularityList(session, print_mode='csv', suggest_mode=None):
     results = Util.get_data(session)
-    if mode == 'csv':
+    if print_mode == 'csv':
         for result in results:
             # print row by row COUNT, SUGGESTION_TO_KEEP
             print("{count}, {name}".format(count=result['count'],

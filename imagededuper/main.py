@@ -69,6 +69,9 @@ def main():  # pragma: no cover
         help='Database URI, e.g. {0}'.format(default_db))
     parser.add_argument('folder', nargs='?', default=os.getcwd(),
         help='Folder to scan')
+    parser.add_argument(
+        '--suggest_mode', choices=['longest_name', 'shortest_name'],
+        help='Mode in which to suggest files', default='shortest_name')
 
     args = parser.parse_args()
 
@@ -79,9 +82,10 @@ def main():  # pragma: no cover
     models.create_tables(engine)
 
     if args.printlist:
-        printpopularitylist.PrintPopularityList(session, args.printlist)
+        printpopularitylist.PrintPopularityList(session,
+            print_mode=args.printlist, suggest_mode=args.suggest_mode)
     elif args.dedupe:
-        dedupeselector.GraphicalDedupe(session)
+        dedupeselector.GraphicalDedupe(session, suggest_mode=args.suggest_mode)
     elif args.scan:
         if args.folder:
             scanfiles.ScanFiles(session, args.folder)

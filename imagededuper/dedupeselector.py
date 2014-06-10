@@ -8,12 +8,12 @@ from . import dialogs
 from . import util
 
 
-def GraphicalDedupe(session):
+def GraphicalDedupe(session, suggest_mode=None):
     tk_root = tkinter.Tk()
     tk_root.withdraw()
     dlg = dialogs.HeroImageWithList(tk_root)
 
-    dupes = util.Util.get_data(session)
+    dupes = util.Util.get_data(session, suggest_mode=suggest_mode)
 
     if len(dupes) == 0:
         print('No duplicate files detected')

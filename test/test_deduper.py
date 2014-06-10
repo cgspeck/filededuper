@@ -113,7 +113,7 @@ def test_deduper(monkeypatch, db_session):
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
 
-    def fake_get_data(session):
+    def fake_get_data(session, suggest_mode):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)

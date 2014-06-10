@@ -124,6 +124,6 @@ def test_get_data_shortest(db_session):
          }
     ]
 
-    actual = Util.get_data(db_session, longest=False)
+    actual = Util.get_data(db_session, suggest_mode='shortest_name')
 
     assert expected == actual

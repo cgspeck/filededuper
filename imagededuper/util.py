@@ -24,7 +24,10 @@ class Util(object):
         return hasher.hexdigest()
 
     @staticmethod
-    def get_data(session, longest=True):
+    def get_data(session, suggest_mode=None):
+        if suggest_mode not in ['longest_name', 'shortest_name']:
+            suggest_mode = 'longest_name'
+
         results = []
 
         qry = session.query(ImageFile.filehash,
@@ -53,11 +56,11 @@ class Util(object):
                     keep_suggestion = result
                     max_len = result.namelen
 
-                if longest:
+                if suggest_mode == 'longest_name':
                     if result.namelen > max_len:
                         keep_suggestion = result
                         max_len = result.namelen
-                else:
+                elif suggest_mode == 'shortest_name':
                     if result.namelen < max_len:
                         keep_suggestion = result
                         max_len = result.namelen
