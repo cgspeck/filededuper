@@ -8,10 +8,14 @@ from . import dialogs
 from . import util
 
 
-def GraphicalDedupe(session, suggest_mode=None):
-    tk_root = tkinter.Tk()
-    tk_root.withdraw()
-    dlg = dialogs.HeroImageWithList(tk_root)
+def Dedupe(session, suggest_mode=None, runmode=None):
+    if runmode not in ['graphical', 'auto']:
+        runmode = 'graphical'
+
+    if runmode == 'graphical':
+        tk_root = tkinter.Tk()
+        tk_root.withdraw()
+        dlg = dialogs.HeroImageWithList(tk_root)
 
     dupes = util.Util.get_data(session, suggest_mode=suggest_mode)
 
@@ -24,30 +28,31 @@ def GraphicalDedupe(session, suggest_mode=None):
         print('Will suggest keeping {record}'.format(
             record=dupe['keep_suggestion']))
 
-        dialog_list = []
+        if runmode == 'graphical':
+            dialog_list = []
 
-        for candidate_file in dupe['files']:
-            suggest = True if (candidate_file['id'] ==
-                dupe['keep_suggestion']['id']) else False
+            for candidate_file in dupe['files']:
+                suggest = True if (candidate_file['id'] ==
+                    dupe['keep_suggestion']['id']) else False
 
-            dialog_list.append({
-                'name': candidate_file['name'],
-                'id': candidate_file['id'],
-                'fullpath': candidate_file['fullpath'],
-                'suggest': suggest})
+                dialog_list.append({
+                    'name': candidate_file['name'],
+                    'id': candidate_file['id'],
+                    'fullpath': candidate_file['fullpath'],
+                    'suggest': suggest})
 
-        dlg.data = dialog_list
-        dlg.mtitle = "Please select the file you would like to keep"
-        dlg.window_init()
+            dlg.data = dialog_list
+            dlg.mtitle = "Please select the file you would like to keep"
+            dlg.window_init()
 
-        result = dlg.get_result()
-        if not result:
-            print('No image selected to keep or cancel pressed')
-            break
+            result = dlg.get_result()
+            if not result:
+                print('No image selected to keep or cancel pressed')
+                break
+            selected_keeper = dupe['files'][result[0]]
+        elif runmode == 'auto':
+            selected_keeper = dupe['keep_suggestion']
 
-        print(result)
-
-        selected_keeper = dupe['files'][result[0]]
         assert selected_keeper is not None
         assert os.path.exists(selected_keeper['fullpath'])
         pprint.pprint('Will retain {0}'.format(selected_keeper))

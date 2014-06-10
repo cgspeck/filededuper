@@ -63,7 +63,8 @@ def main():  # pragma: no cover
         '--printlist', '-p', choices=['csv', 'json'],
         help='Print duplicate count, suggestion (csv) and file list (json)')
     function_group.add_argument(
-        '--dedupe', '-d', action='store_true',
+        '--dedupe', '-d', choices=['auto', 'graphical'],
+        default='graphical',
         help='Interactively prompt to delete duplicate files')
     parser.add_argument('--db', default=default_db,
         help='Database URI, e.g. {0}'.format(default_db))
@@ -85,7 +86,8 @@ def main():  # pragma: no cover
         printpopularitylist.PrintPopularityList(session,
             print_mode=args.printlist, suggest_mode=args.suggest_mode)
     elif args.dedupe:
-        dedupeselector.GraphicalDedupe(session, suggest_mode=args.suggest_mode)
+        dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
+            runmode=args.dedupe)
     elif args.scan:
         if args.folder:
             scanfiles.ScanFiles(session, args.folder)
