@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+# This file is part of the File Deduper project. It is subject to
+# the the revised 3-clause BSD license license terms as set out in the LICENSE
+# file found in the top-level directory of this distribution. No part of this
+# project, including this file, may be copied, modified, propagated, or
+# distributed except according to the terms contained in the LICENSE file.
 import argparse
 import datetime
 import time
@@ -63,8 +68,7 @@ def main():  # pragma: no cover
         '--printlist', '-p', choices=['csv', 'json'],
         help='Print duplicate count, suggestion (csv) and file list (json)')
     function_group.add_argument(
-        '--dedupe', '-d', choices=['auto', 'graphical'],
-        default='graphical',
+        '--dedupe', '-d', choices=['auto', 'graphical', 'cli'],
         help='Interactively prompt to delete duplicate files')
     parser.add_argument('--db', default=default_db,
         help='Database URI, e.g. {0}'.format(default_db))

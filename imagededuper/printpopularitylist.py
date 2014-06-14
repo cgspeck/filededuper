@@ -1,3 +1,8 @@
+# This file is part of the File Deduper project. It is subject to
+# the the revised 3-clause BSD license license terms as set out in the LICENSE
+# file found in the top-level directory of this distribution. No part of this
+# project, including this file, may be copied, modified, propagated, or
+# distributed except according to the terms contained in the LICENSE fileself.
 import pprint
 
 from .util import Util
