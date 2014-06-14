@@ -30,9 +30,36 @@ class Util(object):
 
     @staticmethod
     def get_data(session, suggest_mode=None):
+        results = Util._load_records(session)
         if suggest_mode not in ['longest_name', 'shortest_name']:
             suggest_mode = 'longest_name'
 
+        for result in results:
+            keep_suggestion = None
+
+            for file_ in result['files']:
+                if keep_suggestion is None:
+                    keep_suggestion = file_
+                    max_len = len(file_['name'])
+
+                if suggest_mode == 'longest_name' and len(file_['name'])\
+                        > max_len:
+                    keep_suggestion = file_
+                    max_len = len(file_['name'])
+                elif suggest_mode == 'shortest_name' and len(file_['name'])\
+                        < max_len:
+                    keep_suggestion = file_
+                    max_len = len(file_['name'])
+            # make sure we have set a file to save
+            assert keep_suggestion
+            keep_suggestion = dict(name=keep_suggestion['name'],
+                fullpath=keep_suggestion['fullpath'], id=keep_suggestion['id'])
+
+            result['keep_suggestion'] = keep_suggestion
+        return results
+
+    @staticmethod
+    def _load_records(session):
         results = []
 
         qry = session.query(ImageFile.filehash,
@@ -48,34 +75,12 @@ class Util(object):
                 func.char_length(ImageFile.name).label('namelen'))\
                 .filter(ImageFile.filehash == filehash)
             assert qry.count() == count
-            max_len = 0
 
             files = []
-            keep_suggestion = None
 
             for result in qry:
                 files.append(dict(name=result.name, fullpath=result.fullpath,
                     id=result.id))
-
-                if keep_suggestion is None:
-                    keep_suggestion = result
-                    max_len = result.namelen
-
-                if suggest_mode == 'longest_name':
-                    if result.namelen > max_len:
-                        keep_suggestion = result
-                        max_len = result.namelen
-                elif suggest_mode == 'shortest_name':
-                    if result.namelen < max_len:
-                        keep_suggestion = result
-                        max_len = result.namelen
-
-            # make sure we have set a file to save
-            assert keep_suggestion
-            keep_suggestion = dict(name=keep_suggestion.name,
-                fullpath=keep_suggestion.fullpath, id=keep_suggestion.id)
-
-            results.append(dict(hash=filehash, count=count, files=files,
-                keep_suggestion=keep_suggestion))
+            results.append(dict(hash=filehash, count=count, files=files))
 
         return results
