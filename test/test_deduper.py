@@ -243,7 +243,7 @@ def test_deduper_cli(monkeypatch, db_session):
     )
 
     fake_Dialog = (fudge.Fake('Dialog').is_callable()
-        .with_args('dialog')
+        .with_args(dialog="dialog")
         .returns(fake_dlg_instance)
     )
 

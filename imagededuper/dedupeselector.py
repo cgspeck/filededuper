@@ -8,7 +8,7 @@ import os
 import pprint
 import tkinter
 
-from dialog import Dialog
+import dialog
 
 from .models import ImageFile
 from . import dialogs
@@ -25,7 +25,7 @@ def Dedupe(session, suggest_mode=None, runmode=None):
         dlg = dialogs.HeroImageWithList(tk_root)
     elif runmode == 'cli':
         locale.setlocale(locale.LC_ALL, '')
-        dlg = Dialog(dialog="dialog")
+        dlg = dialog.Dialog(dialog="dialog")
         dlg.set_background_title("File deduper")
 
     dupes = util.Util.get_data(session, suggest_mode=suggest_mode)
