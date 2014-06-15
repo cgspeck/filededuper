@@ -20,14 +20,16 @@ class Util(object):
 
     @staticmethod
     def hash_file(fullpath, blocksize=65536):
-        hasher = hashlib.sha256()
+        hasher1 = hashlib.sha256()
+        hasher2 = hashlib.md5()
         afile = open(fullpath, 'rb')
         buf = afile.read(blocksize)
         while len(buf) > 0:
-            hasher.update(buf)
+            hasher1.update(buf)
+            hasher2.update(buf)
             buf = afile.read(blocksize)
         afile.close()
-        return hasher.hexdigest()
+        return '{0}_{1}'.format(hasher1.hexdigest(), hasher2.hexdigest())
 
     @staticmethod
     def get_data(session, suggest_mode=None):
