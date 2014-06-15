@@ -15,7 +15,13 @@ from .util import Util
 
 def ScanFiles(session, FOLDER):
     for root, dirs, files in os.walk(FOLDER):
+        if root.split('/')[-1].startswith('.'):
+            continue
+
         for count, filename in enumerate(files):
+            if filename.startswith('.'):
+                continue
+
             fullpath = os.path.join(root, filename)
 
             if Util.file_record_exists(session, fullpath):
