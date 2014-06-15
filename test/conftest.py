@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from imagededuper import models
+from deduper import models
 
 
 @pytest.fixture(scope='function')
