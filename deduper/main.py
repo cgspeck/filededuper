@@ -60,7 +60,7 @@ def main():  # pragma: no cover
     parser = argparse.ArgumentParser(description='This application is subject '
     'to the revised 3-clause BSD license, as set out in the LICENSE  file '
     'found in the top-level directory of this distribution. USE AT YOUR OWN '
-    'RISK AND ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE WILL ERASE '
+    'RISK AND ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE MAY ERASE '
     'NON-SELECTED FILES.')
     function_group = parser.add_mutually_exclusive_group()
     function_group.add_argument(
