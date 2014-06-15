@@ -122,7 +122,7 @@ def test_deduper_graphical(monkeypatch, db_session):
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2a.ext')
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2c.ext')
-                   )
+                 )
 
     monkeypatch.setattr(dialogs, 'HeroImageWithList', fake_HeroImageWithList)
     monkeypatch.setattr(tkinter, 'Tk', fake_Tk)
@@ -232,7 +232,7 @@ def test_deduper_auto(monkeypatch, db_session):
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2a.ext')
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2c.ext')
-                   )
+                 )
 
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
@@ -358,7 +358,7 @@ def test_deduper_cli(monkeypatch, db_session):
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2a.ext')
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext', '/a/folder/cf2c.ext')
-                   )
+                 )
 
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
