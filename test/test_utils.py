@@ -1,5 +1,5 @@
 # This file is part of the File Deduper project. It is subject to
-# the the revised 3-clause BSD license license terms as set out in the LICENSE
+# the the revised 3-clause BSD license terms as set out in the LICENSE
 # file found in the top-level directory of this distribution. No part of this
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
@@ -7,8 +7,8 @@ import builtins
 
 import fudge
 
-from imagededuper.util import Util
-from imagededuper.models import ImageFile
+from deduper.util import Util
+from deduper.models import ImageFile
 
 
 @fudge.test
@@ -31,7 +31,8 @@ def test_hash_file(monkeypatch):
     monkeypatch.setattr(builtins, "open", fake_open)
 
     assert "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" \
-        == Util.hash_file('/a/folder/0.ext')
+        "_098f6bcd4621d373cade4e832627b4f6"\
+         == Util.hash_file('/a/folder/0.ext')
 
 
 def test_get_data(db_session):

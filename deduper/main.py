@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # This file is part of the File Deduper project. It is subject to
-# the the revised 3-clause BSD license license terms as set out in the LICENSE
+# the the revised 3-clause BSD license terms as set out in the LICENSE
 # file found in the top-level directory of this distribution. No part of this
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE file.
@@ -57,9 +57,11 @@ def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)
     default_db = 'sqlite:///images.db'
-    parser = argparse.ArgumentParser(description='USE AT YOUR OWN RISK AND '
-        'ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE WILL ERASE '
-        'NON-SELECTED FILES.')
+    parser = argparse.ArgumentParser(description='This application is subject '
+    'to the revised 3-clause BSD license, as set out in the LICENSE  file '
+    'found in the top-level directory of this distribution. USE AT YOUR OWN '
+    'RISK AND ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE WILL ERASE '
+    'NON-SELECTED FILES.')
     function_group = parser.add_mutually_exclusive_group()
     function_group.add_argument(
         '--scan', '-s', action='store_true',

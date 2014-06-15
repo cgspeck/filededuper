@@ -1,5 +1,5 @@
 # This file is part of the File Deduper project. It is subject to
-# the the revised 3-clause BSD license license terms as set out in the LICENSE
+# the the revised 3-clause BSD license terms as set out in the LICENSE
 # file found in the top-level directory of this distribution. No part of this
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
@@ -9,10 +9,10 @@ import tkinter
 import os
 import dialog
 
-from imagededuper import dialogs
-from imagededuper import dedupeselector
-from imagededuper import util
-from imagededuper.models import ImageFile
+from deduper import dialogs
+from deduper import dedupeselector
+from deduper import util
+from deduper.models import ImageFile
 
 
 @fudge.test
