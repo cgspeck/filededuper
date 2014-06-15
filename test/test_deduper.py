@@ -18,7 +18,7 @@ from imagededuper.models import ImageFile
 @fudge.test
 def test_deduper_graphical(monkeypatch, db_session):
     fake_tk_root = fudge.Fake().provides('withdraw')
-    fake_Tk = fudge.Fake('Tk').is_callable().returns(fake_tk_root)
+    fake_Tk = fudge.Fake('Tk').expects_call().returns(fake_tk_root)
 
     first_selection = (0, )  # select first file
     second_selection = (1, )  # select second file
@@ -30,7 +30,7 @@ def test_deduper_graphical(monkeypatch, db_session):
         .expects('get_result').returns(second_selection)
     )
 
-    fake_HeroImageWithList = (fudge.Fake('HeroImageWithList').is_callable()
+    fake_HeroImageWithList = (fudge.Fake('HeroImageWithList').expects_call()
         .with_args(fake_tk_root)
         .returns(fake_dlg_instance)
     )
@@ -98,13 +98,13 @@ def test_deduper_graphical(monkeypatch, db_session):
     db_session.add(new_file)
     db_session.commit()
 
-    fake_exists = (fudge.Fake('exists').is_callable()
+    fake_exists = (fudge.Fake('exists').expects_call()
                     .with_args('/a/folder/cf1a.ext').returns(True)
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext').returns(True)
                    )
 
-    fake_remove = (fudge.Fake('remove').is_callable()
+    fake_remove = (fudge.Fake('remove').expects_call()
                     .with_args('/a/folder/cf1b.ext')
                     .next_call()
                     .with_args('/a/folder/cf1cx.ext')
@@ -114,7 +114,7 @@ def test_deduper_graphical(monkeypatch, db_session):
                     .with_args('/a/folder/cf2c.ext')
                    )
 
-    fake_link = (fudge.Fake('link').is_callable()
+    fake_link = (fudge.Fake('link').expects_call()
                     .with_args('/a/folder/cf1a.ext', '/a/folder/cf1b.ext')
                     .next_call()
                     .with_args('/a/folder/cf1a.ext', '/a/folder/cf1cx.ext')
@@ -208,13 +208,13 @@ def test_deduper_auto(monkeypatch, db_session):
     db_session.add(new_file)
     db_session.commit()
 
-    fake_exists = (fudge.Fake('exists').is_callable()
+    fake_exists = (fudge.Fake('exists').expects_call()
                     .with_args('/a/folder/cf1cx.ext').returns(True)
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext').returns(True)
                    )
 
-    fake_remove = (fudge.Fake('remove').is_callable()
+    fake_remove = (fudge.Fake('remove').expects_call()
                     .with_args('/a/folder/cf1a.ext')
                     .next_call()
                     .with_args('/a/folder/cf1b.ext')
@@ -224,7 +224,7 @@ def test_deduper_auto(monkeypatch, db_session):
                     .with_args('/a/folder/cf2c.ext')
                    )
 
-    fake_link = (fudge.Fake('link').is_callable()
+    fake_link = (fudge.Fake('link').expects_call()
                     .with_args('/a/folder/cf1cx.ext', '/a/folder/cf1a.ext')
                     .next_call()
                     .with_args('/a/folder/cf1cx.ext', '/a/folder/cf1b.ext')
@@ -264,7 +264,7 @@ def test_deduper_cli(monkeypatch, db_session):
         .expects('menu').with_args().returns(second_selection)
     )
 
-    fake_Dialog = (fudge.Fake('Dialog').is_callable()
+    fake_Dialog = (fudge.Fake('Dialog').expects_call()
         .with_args(dialog="dialog")
         .returns(fake_dlg_instance)
     )
@@ -334,13 +334,13 @@ def test_deduper_cli(monkeypatch, db_session):
     db_session.add(new_file)
     db_session.commit()
 
-    fake_exists = (fudge.Fake('exists').is_callable()
+    fake_exists = (fudge.Fake('exists').expects_call()
                     .with_args('/a/folder/cf1cx.ext').returns(True)
                     .next_call()
                     .with_args('/a/folder/cf2bx.ext').returns(True)
                    )
 
-    fake_remove = (fudge.Fake('remove').is_callable()
+    fake_remove = (fudge.Fake('remove').expects_call()
                     .with_args('/a/folder/cf1a.ext')
                     .next_call()
                     .with_args('/a/folder/cf1b.ext')
@@ -350,7 +350,7 @@ def test_deduper_cli(monkeypatch, db_session):
                     .with_args('/a/folder/cf2c.ext')
                    )
 
-    fake_link = (fudge.Fake('link').is_callable()
+    fake_link = (fudge.Fake('link').expects_call()
                     .with_args('/a/folder/cf1cx.ext', '/a/folder/cf1a.ext')
                     .next_call()
                     .with_args('/a/folder/cf1cx.ext', '/a/folder/cf1b.ext')

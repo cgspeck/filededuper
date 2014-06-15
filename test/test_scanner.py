@@ -21,7 +21,7 @@ def test_scanner_happy_path(db_session, monkeypatch):
     monkeypatch.setattr(os, "walk", fake_walk)
 
     fake_hash_file = (fudge.Fake('hash_file')
-                            .is_callable()
+                            .expects_call()
                             .with_args('/a/folder/0.ext')
                             .returns('HASH0')
                             .next_call()
