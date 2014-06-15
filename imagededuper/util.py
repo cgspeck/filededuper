@@ -87,14 +87,20 @@ class Util(object):
         return results
 
     @staticmethod
-    def handle_files(session, candidates, selected_keeper, hash_):
+    def handle_files(session, candidates, selected_keeper, hash_, link=True):
         for candidate_file in candidates:
             if candidate_file['id'] != selected_keeper['id']:
                 try:
                     print('Deleting {0}'.format(candidate_file['fullpath']))
                     os.remove(candidate_file['fullpath'])
+                    if link:
+                        print('Linking {0} to {1}'.format(
+                            selected_keeper['fullpath'],
+                            candidate_file['fullpath']))
+                        os.link(selected_keeper['fullpath'],
+                            candidate_file['fullpath'])
                 except Exception:
-                    print('Unable to delete file!!')
+                    print('Error deleting or linking file!!')
                     session.close()
                     raise
             else:

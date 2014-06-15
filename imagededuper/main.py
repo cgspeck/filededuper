@@ -77,6 +77,9 @@ def main():  # pragma: no cover
     parser.add_argument(
         '--suggest_mode', choices=['longest_name', 'shortest_name'],
         help='Mode in which to suggest files', default='shortest_name')
+    parser.add_argument(
+        '--delete', action='store_true',
+        help='Do not hardlink duplicate files, just delete them')
 
     args = parser.parse_args()
 
@@ -91,7 +94,7 @@ def main():  # pragma: no cover
             print_mode=args.printlist, suggest_mode=args.suggest_mode)
     elif args.dedupe:
         dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
-            runmode=args.dedupe)
+            runmode=args.dedupe, link=not(args.delete))
     elif args.scan:
         if args.folder:
             scanfiles.ScanFiles(session, args.folder)

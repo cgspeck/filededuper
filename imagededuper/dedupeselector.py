@@ -12,7 +12,7 @@ from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical'):
+def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
     if runmode == 'graphical':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
@@ -61,4 +61,4 @@ def Dedupe(session, suggest_mode=None, runmode='graphical'):
         pprint.pprint('Will retain {0}'.format(selected_keeper))
 
         Util.handle_files(session, dupe['files'], selected_keeper,
-            dupe['hash'])
+            dupe['hash'], link=link)
