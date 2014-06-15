@@ -4,8 +4,10 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
 import tkinter
-from PIL import Image, ImageTk
 from tkinter import simpledialog
+
+from PIL import Image, ImageTk
+import dialog
 
 
 class HeroImageWithList(simpledialog.Dialog):
@@ -134,3 +136,40 @@ class HeroImageWithList(simpledialog.Dialog):
 
     def get_result(self):
         return self.result
+
+
+class faux_tk_dialog(object):
+    data = None
+    mtitle = None
+    _dlg = None
+    _result = None
+
+    def __init__(self, title="File deduper"):
+        self._dlg = dialog.Dialog(dialog="dialog")
+        self._dlg.set_background_title(title)
+
+    def window_init(self):
+        tuplelist = [('{0}'.format(num), item['name']) for num, item in
+            enumerate(self.data)]
+        suggested_item = [item for item in self.data if item['suggest']][0]
+        assert suggested_item
+        tuplelist.insert(0, ('-1', suggested_item['name']))
+
+        rc, selected = self._dlg.menu(text='Select a file to keep',
+            choices=tuplelist)
+
+        if rc == 'ok':
+            if selected == '-1':
+                i = 0
+                for i, item in enumerate(self.data):
+                    if item['suggest']:
+                        break
+                self._result = (i, )
+            else:
+                self._result = (int(selected), )
+        else:
+            print('No image selected to keep or cancel pressed')
+            self._result = None
+
+    def get_result(self):
+        return self._result
