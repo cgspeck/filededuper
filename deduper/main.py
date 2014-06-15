@@ -56,7 +56,7 @@ def silly_function():
 def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)
-    default_db = 'sqlite:///images.db'
+    default_db = 'sqlite:///files.db'
     parser = argparse.ArgumentParser(description='This application is subject '
     'to the revised 3-clause BSD license, as set out in the LICENSE  file '
     'found in the top-level directory of this distribution. USE AT YOUR OWN '
