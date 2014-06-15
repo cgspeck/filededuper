@@ -10,15 +10,11 @@ import tkinter
 
 import dialog
 
-from .models import ImageFile
 from . import dialogs
-from . import util
+from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode=None):
-    if runmode not in ['graphical', 'auto', 'cli']:
-        runmode = 'graphical'
-
+def Dedupe(session, suggest_mode=None, runmode='graphical'):
     if runmode == 'graphical':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
@@ -28,11 +24,7 @@ def Dedupe(session, suggest_mode=None, runmode=None):
         dlg = dialog.Dialog(dialog="dialog")
         dlg.set_background_title("File deduper")
 
-    dupes = util.Util.get_data(session, suggest_mode=suggest_mode)
-
-    if len(dupes) == 0:
-        print('No duplicate files detected')
-        return
+    dupes = Util.get_data(session, suggest_mode=suggest_mode)
 
     for dupe in dupes:
         assert 'keep_suggestion' in dupe
@@ -87,21 +79,5 @@ def Dedupe(session, suggest_mode=None, runmode=None):
         assert os.path.exists(selected_keeper['fullpath'])
         pprint.pprint('Will retain {0}'.format(selected_keeper))
 
-        for candidate_file in dupe['files']:
-            if candidate_file['id'] != selected_keeper['id']:
-                try:
-                    print('Deleting {0}'.format(candidate_file['fullpath']))
-                    os.remove(candidate_file['fullpath'])
-                except Exception:
-                    print('Unable to delete file!!')
-                    session.close()
-                    raise
-            else:
-                print('Keeping {name}'
-                    .format(name=candidate_file['name']))
-
-        session.query(ImageFile) \
-            .filter(ImageFile.filehash == dupe['hash'],
-                ImageFile.id != selected_keeper['id'])\
-            .delete()
-        session.commit()
+        Util.handle_files(session, dupe['files'], selected_keeper,
+            dupe['hash'])

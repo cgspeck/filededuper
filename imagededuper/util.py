@@ -4,17 +4,18 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
 import hashlib
+import os
 
 from sqlalchemy.sql import func
 
-from .models import ImageFile
+from . import models
 
 
 class Util(object):
     @staticmethod
     def file_record_exists(session, fullpath):
-        query = session.query(ImageFile).filter(
-            ImageFile.fullpath.like(fullpath))
+        query = session.query(models.ImageFile).filter(
+            models.ImageFile.fullpath.like(fullpath))
         return not (query.first() is None)
 
     @staticmethod
@@ -62,18 +63,18 @@ class Util(object):
     def _load_records(session):
         results = []
 
-        qry = session.query(ImageFile.filehash,
+        qry = session.query(models.ImageFile.filehash,
             func.count('*').label('hash_count'))\
-            .group_by(ImageFile.filehash).having(func.count('*') > 1)
+            .group_by(models.ImageFile.filehash).having(func.count('*') > 1)
 
-        for filehash, count in session.query(ImageFile.filehash,
+        for filehash, count in session.query(models.ImageFile.filehash,
                 func.count('*').label('hash_count'))\
-                .group_by(ImageFile.filehash).having(func.count('*') > 1)\
-                .order_by('hash_count desc'):
-            qry = session.query(ImageFile.id, ImageFile.name,
-                ImageFile.fullpath,
-                func.char_length(ImageFile.name).label('namelen'))\
-                .filter(ImageFile.filehash == filehash)
+                .group_by(models.ImageFile.filehash).having(func.count('*')
+                    > 1).order_by('hash_count desc'):
+            qry = session.query(models.ImageFile.id, models.ImageFile.name,
+                models.ImageFile.fullpath,
+                func.char_length(models.ImageFile.name).label('namelen'))\
+                .filter(models.ImageFile.filehash == filehash)
             assert qry.count() == count
 
             files = []
@@ -84,3 +85,24 @@ class Util(object):
             results.append(dict(hash=filehash, count=count, files=files))
 
         return results
+
+    @staticmethod
+    def handle_files(session, candidates, selected_keeper, hash_):
+        for candidate_file in candidates:
+            if candidate_file['id'] != selected_keeper['id']:
+                try:
+                    print('Deleting {0}'.format(candidate_file['fullpath']))
+                    os.remove(candidate_file['fullpath'])
+                except Exception:
+                    print('Unable to delete file!!')
+                    session.close()
+                    raise
+            else:
+                print('Keeping {name}'
+                    .format(name=candidate_file['name']))
+
+        session.query(models.ImageFile) \
+            .filter(models.ImageFile.filehash == hash_,
+                models.ImageFile.id != selected_keeper['id'])\
+            .delete()
+        session.commit()
