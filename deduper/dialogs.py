@@ -13,7 +13,8 @@ import dialog
 class HeroImageWithList(simpledialog.Dialog):
     data = []
     result = None
-    __image = None
+    _original_image_pil = None
+    _resized_image = None
     mtitle = None
     listbox = None
 
@@ -49,9 +50,14 @@ class HeroImageWithList(simpledialog.Dialog):
 
         # END FRAME_IN_CANVAS
         body = self.frame
-        self.initial_focus = self.body(body)
-
         self.buttonbox()
+        screen_height = self.parent.winfo_screenheight()
+        max_height = screen_height * 0.9
+        self.initial_focus = self.body(body,
+            max_height=(max_height -
+            self.button_box.winfo_reqheight()),
+            max_width=self.parent.winfo_screenwidth())
+
 
         self.grab_set()
 
@@ -63,8 +69,6 @@ class HeroImageWithList(simpledialog.Dialog):
 
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
-        screen_height = self.parent.winfo_screenheight()
-        max_height = screen_height * 0.8
         self.update_idletasks()
 
         if self.frame.winfo_reqheight() > self.canvas.winfo_reqheight():
@@ -88,7 +92,7 @@ class HeroImageWithList(simpledialog.Dialog):
         self.initial_focus.focus_set()
         self.wait_window(self)
 
-    def body(self, master):
+    def body(self, master, max_height, max_width):
         self.result = None
 
         scrollbar = tkinter.Scrollbar(master, orient=tkinter.VERTICAL)
@@ -101,13 +105,32 @@ class HeroImageWithList(simpledialog.Dialog):
         listbox.pack(side=tkinter.LEFT, fill=tkinter.Y)
 
         try:
-            self.__image = ImageTk.PhotoImage(Image.open("%s"
-                % self.data[0]['fullpath']))
-            label = tkinter.Label(master, image=self.__image)
+            self._original_image_pil = Image.open("%s"
+                % self.data[0]['fullpath'])
+            if self._original_image_pil.size[0] > max_width:
+                desired_width = max_width
+                desired_height = int(self._original_image_pil.size[1] * \
+                    (desired_width / self._original_image_pil.size[0]))
+            elif self._original_image_pil.size[1] > max_height:
+                desired_height = max_height
+                desired_width = int(self._original_image_pil.size[0] * \
+                    (desired_height / self._original_image_pil.size[1]))
+            
+            if desired_height or desired_width:
+                self._resized_image = ImageTk.PhotoImage(
+                    self._original_image_pil.resize((desired_width,
+                        desired_height)))
+            else:
+                self._resized_image = ImageTk.PhotoImage(
+                    self._original_image_pil)
+
+            label = tkinter.Label(master, image=self._resized_image)
             label.pack()
         except Exception as e:
             print('Unable to display image')
             print(e)
+
+        from ipdb import set_trace; set_trace()
 
         for item in self.data:
             listbox.insert(tkinter.END, item['name'])
