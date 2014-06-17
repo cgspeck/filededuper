@@ -100,10 +100,14 @@ class HeroImageWithList(simpledialog.Dialog):
 
         listbox.pack(side=tkinter.LEFT, fill=tkinter.Y)
 
-        self.__image = ImageTk.PhotoImage(Image.open("%s"
-            % self.data[0]['fullpath']))
-        label = tkinter.Label(master, image=self.__image)
-        label.pack()
+        try:
+            self.__image = ImageTk.PhotoImage(Image.open("%s"
+                % self.data[0]['fullpath']))
+            label = tkinter.Label(master, image=self.__image)
+            label.pack()
+        except Exception as e:
+            print('Unable to display image')
+            print(e)
 
         for item in self.data:
             listbox.insert(tkinter.END, item['name'])
