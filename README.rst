@@ -12,6 +12,10 @@ This was built in Arch on Python 3.4, but should work in any version from 3.2
 upwards. Runtime requirements are listed in setup.py and dev/test requirements
 are in requirement-dev.txt
 
+A much more primative version of this was originally used to deduplicate a
+large photo collection, but it could be used for any similar mass of files
+(e.g. music collection from different sources etc, if the files are identical).
+
 Installing & Running
 --------------------
 
