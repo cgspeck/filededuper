@@ -37,13 +37,19 @@ def setup_logging():    # pragma: no cover
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     insp = frame
+    i = 500
     while True:
         if 'session' in insp.f_locals:
             print('Closing database')
             insp.f_locals['session'].close()
             sys.exit()
         else:
-            insp = frame.f_back
+            if i < 0:
+                print('Could not cleanly close database session')
+                break
+            else:
+                insp = frame.f_back
+            i -= 1
     sys.exit(0)
 
 
@@ -98,7 +104,7 @@ def main():  # pragma: no cover
         dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
             runmode=args.dedupe, link=not(args.delete))
     elif args.scan:
-        if args.folder:
+        if os.path.isdir(args.folder):
             scanfiles.ScanFiles(session, args.folder)
         else:
             print('Must supply a folder to scan')
