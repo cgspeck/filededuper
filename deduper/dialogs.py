@@ -59,7 +59,6 @@ class HeroImageWithList(simpledialog.Dialog):
             - 50),  # title bar
             max_width=self.parent.winfo_screenwidth())
 
-
         self.grab_set()
 
         upper_frame.pack(expand=True, fill="both")
@@ -112,15 +111,15 @@ class HeroImageWithList(simpledialog.Dialog):
             original_y = self._original_image_pil.size[1]
             if original_x > max_width or original_y > max_height:
                 if max_width < max_height:
-                    #width is the limiter
+                    # width is the limiter
                     desired_width = int(max_width)
                     desired_height = int(original_y *
                         (desired_width / original_x))
                 else:
-                    #height is the limiter
+                    # height is the limiter
                     desired_height = int(max_height)
-                    desired_width = int(original_x * \
-                        (desired_height / original_y))                    
+                    desired_width = int(original_x *
+                        (desired_height / original_y))
                 self._resized_image = ImageTk.PhotoImage(
                     self._original_image_pil.resize((desired_width,
                         desired_height)))
@@ -139,6 +138,9 @@ class HeroImageWithList(simpledialog.Dialog):
             if item['suggest']:
                 print('set suggest flag')
                 listbox.select_set(listbox.size() - 1)
+
+    def resize(self, event):
+        print(event.width, event.height)
 
     def apply(self):
         self.result = self.listbox.curselection()
