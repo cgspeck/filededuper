@@ -107,16 +107,24 @@ class HeroImageWithList(simpledialog.Dialog):
         try:
             self._original_image_pil = Image.open("%s"
                 % self.data[0]['fullpath'])
-            if self._original_image_pil.size[0] > max_width:
-                desired_width = max_width
-                desired_height = int(self._original_image_pil.size[1] * \
-                    (desired_width / self._original_image_pil.size[0]))
-            elif self._original_image_pil.size[1] > max_height:
-                desired_height = max_height
-                desired_width = int(self._original_image_pil.size[0] * \
-                    (desired_height / self._original_image_pil.size[1]))
-            
-            if desired_height or desired_width:
+            original_x = self._original_image_pil.size[0]
+            original_y = self._original_image_pil.size[1]
+            if original_x > max_width or original_y > max_height:
+                # which metric is more out of whack?
+                if (original_x - max_width) > (original_y - max_height):
+                    #width is the limiter
+                    print('limit by width, {0}, {1}'.format(original_x,
+                        max_width))
+                    desired_width = max_width
+                    desired_height = int(original_y *
+                        (desired_width / original_x))
+                else:
+                    #height is the limiter
+                    print('limit by height, {0}, {1}'.format(original_y,
+                        max_height))                    
+                    desired_height = max_height
+                    desired_width = int(original_x * \
+                        (desired_height / original_y))                    
                 self._resized_image = ImageTk.PhotoImage(
                     self._original_image_pil.resize((desired_width,
                         desired_height)))
