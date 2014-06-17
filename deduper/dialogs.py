@@ -110,19 +110,14 @@ class HeroImageWithList(simpledialog.Dialog):
             original_x = self._original_image_pil.size[0]
             original_y = self._original_image_pil.size[1]
             if original_x > max_width or original_y > max_height:
-                # which metric is more out of whack?
-                if (original_x - max_width) > (original_y - max_height):
+                if max_width < max_height:
                     #width is the limiter
-                    print('limit by width, {0}, {1}'.format(original_x,
-                        max_width))
-                    desired_width = max_width
+                    desired_width = int(max_width)
                     desired_height = int(original_y *
                         (desired_width / original_x))
                 else:
                     #height is the limiter
-                    print('limit by height, {0}, {1}'.format(original_y,
-                        max_height))                    
-                    desired_height = max_height
+                    desired_height = int(max_height)
                     desired_width = int(original_x * \
                         (desired_height / original_y))                    
                 self._resized_image = ImageTk.PhotoImage(
@@ -138,7 +133,7 @@ class HeroImageWithList(simpledialog.Dialog):
             print('Unable to display image')
             print(e)
 
-        from ipdb import set_trace; set_trace()
+        #from ipdb import set_trace; set_trace()
 
         for item in self.data:
             listbox.insert(tkinter.END, item['name'])
