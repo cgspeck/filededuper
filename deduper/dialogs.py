@@ -55,7 +55,8 @@ class HeroImageWithList(simpledialog.Dialog):
         max_height = screen_height * 0.9
         self.initial_focus = self.body(body,
             max_height=(max_height -
-            self.button_box.winfo_reqheight()),
+            self.button_box.winfo_reqheight()
+            - 50),  # title bar
             max_width=self.parent.winfo_screenwidth())
 
 
@@ -132,8 +133,6 @@ class HeroImageWithList(simpledialog.Dialog):
         except Exception as e:
             print('Unable to display image')
             print(e)
-
-        #from ipdb import set_trace; set_trace()
 
         for item in self.data:
             listbox.insert(tkinter.END, item['name'])
