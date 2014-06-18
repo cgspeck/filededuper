@@ -18,7 +18,7 @@ def ScanFiles(session, FOLDER):
         if root.split('/')[-1].startswith('.'):
             continue
 
-        for count, filename in enumerate(files):
+        for count, filename in enumerate(files, start=1):
             if filename.startswith('.'):
                 continue
 
