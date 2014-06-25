@@ -24,6 +24,9 @@ def ScanFiles(session, FOLDER):
 
             fullpath = os.path.join(root, filename)
 
+            if not os.path.isfile(fullpath):
+                continue
+
             if Util.file_record_exists(session, fullpath):
                 print('{count} of {length}: Skipping {filename}'.format(
                     count=count, length=len(files), filename=filename))
