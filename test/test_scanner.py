@@ -18,7 +18,21 @@ def test_scanner_happy_path(db_session, monkeypatch):
         .returns([('/a/folder', [],
         ['{0}.ext'.format(num) for num in range(3)])]))
 
-    monkeypatch.setattr(os, "walk", fake_walk)
+    monkeypatch.setattr(os, 'walk', fake_walk)
+
+    fake_isfile = (fudge.Fake('isfile')
+        .expects_call()
+        .with_args('/a/folder/0.ext')
+        .returns(True)
+        .next_call()
+        .with_args('/a/folder/1.ext')
+        .returns(True)
+        .next_call()
+        .with_args('/a/folder/2.ext')
+        .returns(True)
+    )
+
+    monkeypatch.setattr(os.path, 'isfile', fake_isfile)
 
     fake_hash_file = (fudge.Fake('hash_file')
                             .expects_call()
