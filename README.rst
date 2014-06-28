@@ -58,6 +58,6 @@ Running the tests
 -----------------
 
 Check out the repo then::
-
- pip install -r requirements-dev.txt
+ pip install -e .
+ pip install -e .[tests]
  py.test
