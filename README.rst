@@ -58,6 +58,7 @@ Running the tests
 -----------------
 
 Check out the repo then::
- pip install -e .
+
  pip install -e .[tests]
  py.test
+ flake8
