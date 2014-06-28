@@ -3,18 +3,27 @@ File Deuper
 ===========
 Copyright (c) 2014, Christopher Speck 
 
-This application is subject to the revised 3-clause BSD license, as set out in
-the LICENSE  file found in the top-level directory of this distribution. USE AT
-YOUR OWN RISK AND ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE MAY ERASE
-NON-SELECTED FILES.
+This application is designed to scan through and hash a collection of files,
+and then help you deduplicate them by hardlinking or removing the duplicates.
+
+When deduping, it has three modes of running:-
+- graphical: if an image, try to display it along with a list of identical files
+- console: displays a cursors dialog with matching files
+- auto: will hardlink or delete duplicate files without prompt
+
+A much more primative version of this was originally used to deduplicate a
+large photo collection, but it could be used for any similar mass of files
+(e.g. music collection, folder full of duplicate logs etc as long as the files
+are identical).
 
 This was built in Arch on Python 3.4, but should work in any version from 3.2
 upwards. Runtime requirements are listed in setup.py and dev/test requirements
 are in requirement-dev.txt
 
-A much more primative version of this was originally used to deduplicate a
-large photo collection, but it could be used for any similar mass of files
-(e.g. music collection from different sources etc, if the files are identical).
+This application is subject to the revised 3-clause BSD license, as set out in
+the LICENSE  file found in the top-level directory of this distribution. USE AT
+YOUR OWN RISK AND ONLY AFTER TAKING A BACKUP. RUNNING IN DEDUPE MODE MAY ERASE
+NON-SELECTED FILES.
 
 Installing & Running
 --------------------
