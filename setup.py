@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='FileDeduper',
-    version='0.9',
+    version='0.9.1',
     description='Scan for and index files, then present files with matching'
     'hashes, preselecting one to save.',
     author='Chris Speck',
