@@ -7,12 +7,13 @@ import locale
 import os
 import pprint
 import tkinter
+import sys
 
 from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
+def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, **kwargs):
     if runmode == 'graphical':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
@@ -48,9 +49,14 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
             dlg.window_init()
 
             result = dlg.get_result()
+            if dlg.quit:
+                print('Exiting')
+                sys.exit()
+
             if not result:
                 print('No image selected to keep or cancel pressed')
-                break
+                continue
+
             selected_keeper = dupe['files'][result[0]]
 
         elif runmode == 'auto':

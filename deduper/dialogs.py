@@ -23,6 +23,8 @@ class HeroImageWithList(simpledialog.Dialog):
             self.mparent = tkinter.Tk()
         else:
             self.mparent = parent
+        self.quit = False
+
 
     def window_init(self):
         tkinter.Toplevel.__init__(self, self.mparent)
@@ -152,6 +154,11 @@ class HeroImageWithList(simpledialog.Dialog):
         '''Reset the scroll region to encompass the inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+    def set_quit(self):
+        print('Quit request registered')
+        self.quit = True
+        self.cancel()
+
     def buttonbox(self):
         self.button_box = tkinter.Frame(self)
 
@@ -160,6 +167,9 @@ class HeroImageWithList(simpledialog.Dialog):
         w.pack(side=tkinter.LEFT, padx=5, pady=5)
         w = tkinter.Button(self.button_box, text="Cancel", width=10,
             command=self.cancel)
+        w.pack(side=tkinter.LEFT, padx=5, pady=5)
+        w = tkinter.Button(self.button_box, text="Quit", width=10,
+            command=self.set_quit)
         w.pack(side=tkinter.LEFT, padx=5, pady=5)
 
         self.bind("<Return>", self.ok)
