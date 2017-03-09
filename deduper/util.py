@@ -89,17 +89,20 @@ class Util(object):
         return results
 
     @staticmethod
-    def handle_files(session, candidates, selected_keeper, hash_, link=True):
+    def handle_files(session, candidates, selected_keepers, hash_, link=True):
+        print(locals())
+        selected_ids = [s['id'] for s in selected_keepers]
+
         for candidate_file in candidates:
-            if candidate_file['id'] != selected_keeper['id']:
+            if candidate_file['id'] not in selected_ids:
                 try:
                     print('Deleting {0}'.format(candidate_file['fullpath']))
                     os.remove(candidate_file['fullpath'])
                     if link:
                         print('Linking {0} to {1}'.format(
-                            selected_keeper['fullpath'],
+                            selected_keepers[0]['fullpath'],
                             candidate_file['fullpath']))
-                        os.link(selected_keeper['fullpath'],
+                        os.link(selected_keepers[0]['fullpath'],
                             candidate_file['fullpath'])
                 except Exception:
                     print('Error deleting or linking file!!')
@@ -110,7 +113,10 @@ class Util(object):
                     .format(name=candidate_file['name']))
 
         session.query(models.ImageFile) \
-            .filter(models.ImageFile.filehash == hash_,
-                models.ImageFile.id != selected_keeper['id'])\
-            .delete()
+            .filter(
+                models.ImageFile.filehash == hash_,
+                models.ImageFile.id.notin_(selected_ids)
+            ) \
+            .delete(synchronize_session='fetch')
+
         session.commit()
