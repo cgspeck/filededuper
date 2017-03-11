@@ -134,7 +134,7 @@ def test_deduper_graphical_link(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -225,7 +225,7 @@ def test_deduper_graphical_delete(monkeypatch, db_session):
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -333,7 +333,7 @@ def test_deduper_auto(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -459,7 +459,7 @@ def test_deduper_cli(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -556,7 +556,7 @@ def test_deduper_delete_mode(monkeypatch, db_session):
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)

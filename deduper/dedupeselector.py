@@ -13,7 +13,7 @@ from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, **kwargs):
+def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_path=None):
     if runmode == 'graphical':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
@@ -23,7 +23,7 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, **kwargs)
         dlg = dialogs.faux_tk_dialog("File deduper")
         # dialog.Dialog(dialog="dialog")
 
-    dupes = Util.get_data(session, suggest_mode=suggest_mode)
+    dupes = Util.get_data(session, suggest_mode=suggest_mode, delete_path=delete_path)
 
     for dupe in dupes:
         assert 'keep_suggestions' in dupe, 'Dupe record must have a keep_suggestions field'

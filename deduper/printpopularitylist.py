@@ -8,7 +8,7 @@ import pprint
 from .util import Util
 
 
-def PrintPopularityList(session, print_mode='csv', suggest_mode=None):
+def PrintPopularityList(session, print_mode='csv', suggest_mode=None, **kwargs):
     results = Util.get_data(session)
     if print_mode == 'csv':
         for result in results:

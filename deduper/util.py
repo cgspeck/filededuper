@@ -4,6 +4,7 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
 from copy import copy
+from pprint import pprint
 import hashlib
 import os
 
@@ -96,24 +97,31 @@ class Util(object):
 
     @staticmethod
     def handle_files(session, candidates, selected_keepers, hash_, link=True):
-        print(locals())
         selected_ids = [s['id'] for s in selected_keepers]
+        pprint(locals())
 
         for candidate_file in candidates:
             if candidate_file['id'] not in selected_ids:
                 try:
                     print('Deleting {0}'.format(candidate_file['fullpath']))
                     os.remove(candidate_file['fullpath'])
-                    if link:
+                except Exception:
+                    print('Error deleting file!!')
+                    session.close()
+                    raise
+
+                if link:
+                    try:
                         print('Linking {0} to {1}'.format(
                             selected_keepers[0]['fullpath'],
                             candidate_file['fullpath']))
                         os.link(selected_keepers[0]['fullpath'],
                             candidate_file['fullpath'])
-                except Exception:
-                    print('Error deleting or linking file!!')
-                    session.close()
-                    raise
+                    except Exception:
+                        print('Error linking file!!')
+                        session.close()
+                        raise
+
             else:
                 print('Keeping {name}'
                     .format(name=candidate_file['name']))
