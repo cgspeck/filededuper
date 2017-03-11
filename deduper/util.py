@@ -3,6 +3,7 @@
 # file found in the top-level directory of this distribution. No part of this
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
+from copy import copy
 import hashlib
 import os
 
@@ -32,33 +33,38 @@ class Util(object):
         return '{0}_{1}'.format(hasher1.hexdigest(), hasher2.hexdigest())
 
     @staticmethod
-    def get_data(session, suggest_mode=None):
+    def get_data(session, suggest_mode=None, delete_path=None):
         results = Util._load_records(session)
-        if suggest_mode not in ['longest_name', 'shortest_name']:
+        if suggest_mode not in ['longest_name', 'shortest_name', 'delete_path']:
             suggest_mode = 'longest_name'
 
+        if suggest_mode == 'delete_path' and delete_path is None:
+            raise 'Must provide a path containing files that you want removed'
+
         for result in results:
-            keep_suggestion = None
+            keep_suggestions = []
 
             for file_ in result['files']:
-                if keep_suggestion is None:
-                    keep_suggestion = file_
+                if suggest_mode == 'delete_path' and not file_['fullpath'].startswith(delete_path):
+                    keep_suggestions.append(copy(file_))
+                    continue
+
+                if len(keep_suggestions) == 0:
+                    keep_suggestions = [file_]
                     max_len = len(file_['name'])
 
                 if suggest_mode == 'longest_name' and len(file_['name'])\
                         > max_len:
-                    keep_suggestion = file_
+                    keep_suggestions = [file_]
                     max_len = len(file_['name'])
                 elif suggest_mode == 'shortest_name' and len(file_['name'])\
                         < max_len:
-                    keep_suggestion = file_
+                    keep_suggestions = [file_]
                     max_len = len(file_['name'])
-            # make sure we have set a file to save
-            assert keep_suggestion
-            keep_suggestion = dict(name=keep_suggestion['name'],
-                fullpath=keep_suggestion['fullpath'], id=keep_suggestion['id'])
+            # make sure we have set at least one file to save
+            assert len(keep_suggestions) > 0
+            result['keep_suggestions'] = keep_suggestions
 
-            result['keep_suggestion'] = keep_suggestion
         return results
 
     @staticmethod

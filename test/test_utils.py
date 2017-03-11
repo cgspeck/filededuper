@@ -68,15 +68,15 @@ def test_get_data(db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -118,18 +118,75 @@ def test_get_data_shortest(db_session):
             {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3}
+        'keep_suggestions':
+            [{'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7}]
          }
     ]
 
     actual = Util.get_data(db_session, suggest_mode='shortest_name')
+
+    assert expected == actual
+
+def test_get_data_with_deletepath(db_session):
+    ''' Test the select by delete path method.
+        It should return a list to files to keep that are not within the specified directory
+    '''
+    common_file_1a = ImageFile(
+        name='cf1.ext', fullpath='/a/folder/cf1.ext', filehash='cf1', id=1
+    )
+    common_file_1b = ImageFile(
+        name='cf1b.ext', fullpath='/b/folder/cf1b.ext', filehash='cf1', id=2
+    )
+    common_file_1c = ImageFile(
+        name='cf1cx.ext', fullpath='/c/folder/cf1cx.ext', filehash='cf1', id=3
+    )
+    common_file_2a = ImageFile(
+        name='cf2a.ext', fullpath='/a/folder/cf2a.ext', filehash='cf2', id=4
+    )
+    common_file_2b = ImageFile(
+        name='cf2b.ext', fullpath='/b/folder/cf2b.ext', filehash='cf2', id=5
+    )
+    common_file_2c = ImageFile(
+        name='cf2c.ext', fullpath='/c/folder/cf2c.ext', filehash='cf2', id=6
+    )
+    db_session.add(common_file_1a)
+    db_session.add(common_file_1b)
+    db_session.add(common_file_1c)
+    db_session.add(common_file_2a)
+    db_session.add(common_file_2b)
+    db_session.add(common_file_2c)
+    db_session.commit()
+
+    expected = [
+        {'hash': 'cf1', 'count': 3, 'files': [
+            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 1},
+            {'name': 'cf1b.ext', 'fullpath': '/b/folder/cf1b.ext', 'id': 2},
+            {'name': 'cf1cx.ext', 'fullpath': '/c/folder/cf1cx.ext', 'id': 3}],
+        'keep_suggestions':
+            [
+                {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 1},
+                {'name': 'cf1cx.ext', 'fullpath': '/c/folder/cf1cx.ext', 'id': 3},
+            ]
+         },
+        {'hash': 'cf2', 'count': 3, 'files': [
+            {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 4},
+            {'name': 'cf2b.ext', 'fullpath': '/b/folder/cf2b.ext', 'id': 5},
+            {'name': 'cf2c.ext', 'fullpath': '/c/folder/cf2c.ext', 'id': 6}],
+        'keep_suggestions':
+            [
+                {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 4},
+                {'name': 'cf2c.ext', 'fullpath': '/c/folder/cf2c.ext', 'id': 6}
+            ]
+         }
+    ]
+
+    actual = Util.get_data(db_session, suggest_mode='delete_path', delete_path='/b')
 
     assert expected == actual
