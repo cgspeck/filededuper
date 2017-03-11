@@ -26,17 +26,17 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, **kwargs)
     dupes = Util.get_data(session, suggest_mode=suggest_mode)
 
     for dupe in dupes:
-        assert 'keep_suggestion' in dupe
+        assert 'keep_suggestions' in dupe, 'Dupe record must have a keep_suggestions field'
+        assert len(dupe['keep_suggestions']), 'keep_suggestions must have at least one item in it'
         print('Will suggest keeping {record}'.format(
-            record=dupe['keep_suggestion']))
+            record=dupe['keep_suggestions']))
         selected_keepers = []
 
         if runmode != 'auto':
             dialog_list = []
 
             for candidate_file in dupe['files']:
-                suggest = True if (candidate_file['id'] ==
-                    dupe['keep_suggestion']['id']) else False
+                suggest = True if (candidate_file['id'] in [r['id'] for r in dupe['keep_suggestions']]) else False
 
                 dialog_list.append({
                     'name': candidate_file['name'],
@@ -62,7 +62,7 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, **kwargs)
             selected_keepers = list(map(lambda i: dupe['files'][i], result))
 
         elif runmode == 'auto':
-            selected_keepers = [dupe['keep_suggestion']]
+            selected_keepers = dupe['keep_suggestions']
 
         assert selected_keepers is not None
         assert len(selected_keepers) > 0

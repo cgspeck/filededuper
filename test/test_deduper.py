@@ -44,15 +44,15 @@ def test_deduper_graphical_link(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -174,8 +174,8 @@ def test_deduper_graphical_delete(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          }
     ]
 
@@ -245,15 +245,15 @@ def test_deduper_auto(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -371,15 +371,15 @@ def test_deduper_cli(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -479,15 +479,15 @@ def test_deduper_delete_mode(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
