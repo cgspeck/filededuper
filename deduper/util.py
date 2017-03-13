@@ -81,7 +81,7 @@ class Util(object):
                 .group_by(models.ImageFile.filehash).having(func.count('*')
                     > 1).order_by('hash_count desc'):
             qry = session.query(models.ImageFile.id, models.ImageFile.name,
-                models.ImageFile.fullpath,
+                models.ImageFile.fullpath, models.ImageFile.filehash,
                 func.char_length(models.ImageFile.name).label('namelen'))\
                 .filter(models.ImageFile.filehash == filehash)
             assert qry.count() == count
@@ -90,7 +90,7 @@ class Util(object):
 
             for result in qry:
                 files.append(dict(name=result.name, fullpath=result.fullpath,
-                    id=result.id))
+                    id=result.id, hash=result.filehash))
             results.append(dict(hash=filehash, count=count, files=files))
 
         return results
@@ -98,7 +98,6 @@ class Util(object):
     @staticmethod
     def handle_files(session, candidates, selected_keepers, hash_, link=True):
         selected_ids = [s['id'] for s in selected_keepers]
-        pprint(locals())
 
         for candidate_file in candidates:
             if candidate_file['id'] not in selected_ids:
