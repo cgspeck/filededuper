@@ -35,8 +35,10 @@ def test_hash_file(monkeypatch):
          == Util.hash_file('/a/folder/0.ext')
 
 
-def test_get_data(db_session):
-    # returns a json dict of files with matching hashes in groups
+def test_get_data_longest_filename(db_session):
+    '''
+    This will suggest for retention the file record with the longest _filename_
+    '''
     unique_file_1 = ImageFile(id=1, name='0.ext', fullpath='/a/folder/0.ext', filehash='hash0')
     unique_file_2 = ImageFile(id=2, name='1.ext', fullpath='/a/folder/1.ext', filehash='hash1')
     common_file_1a = ImageFile(id=3, name='cf1a.ext', fullpath='/a/folder/cf1a.ext', filehash='cf1')
@@ -78,13 +80,15 @@ def test_get_data(db_session):
          }
     ]
 
-    actual = Util.get_data(db_session)
+    actual = Util.get_data(db_session, suggest_mode='longest_name')
 
     assert expected == actual
 
 
 def test_get_data_shortest(db_session):
-    # returns a json dict of files with matching hashes in groups
+    '''
+    This will suggest for retention the file record with the shortest _filename_
+    '''
     common_file_1a = ImageFile(
         name='cf1.ext', fullpath='/a/folder/cf1.ext', filehash='cf1', id=1
     )
@@ -139,8 +143,8 @@ def test_get_data_shortest(db_session):
     assert expected == actual
 
 def test_get_data_with_deletepath(db_session):
-    ''' Test the select by delete path method.
-        It should return a list to files to keep that are not within the specified directory
+    '''
+    This will suggest for retention any file that isn't within delete_path
     '''
     common_file_1a = ImageFile(
         name='cf1.ext', fullpath='/a/folder/cf1.ext', filehash='cf1', id=1

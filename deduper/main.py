@@ -53,12 +53,6 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 
-def silly_function():
-    while True:
-        print(datetime.datetime.now())
-        time.sleep(1)
-
-
 def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)

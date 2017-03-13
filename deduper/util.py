@@ -37,7 +37,7 @@ class Util(object):
     def get_data(session, suggest_mode=None, delete_path=None):
         results = Util._load_records(session)
         if suggest_mode not in ['longest_name', 'shortest_name', 'delete_path']:
-            suggest_mode = 'longest_name'
+            raise ValueError('Must specify a suggestion mode')
 
         if suggest_mode == 'delete_path' and delete_path is None:
             raise 'Must provide a path containing files that you want removed'
@@ -54,14 +54,15 @@ class Util(object):
                     keep_suggestions = [file_]
                     max_len = len(file_['name'])
 
-                if suggest_mode == 'longest_name' and len(file_['name'])\
-                        > max_len:
+                if suggest_mode == 'longest_name' and len(file_['name']) > max_len:
+                    print('bass')
                     keep_suggestions = [file_]
                     max_len = len(file_['name'])
-                elif suggest_mode == 'shortest_name' and len(file_['name'])\
-                        < max_len:
+                elif suggest_mode == 'shortest_name' and len(file_['name']) < max_len:
+                    print('found a shorter path')
                     keep_suggestions = [file_]
                     max_len = len(file_['name'])
+
             # make sure we have set at least one file to save
             assert len(keep_suggestions) > 0
             result['keep_suggestions'] = keep_suggestions
