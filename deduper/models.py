@@ -20,6 +20,14 @@ class ImageFile(Base):
         rs = "<ImageFile(name='%s', fullpath='%s', filehash='%s')>"
         return rs % (self.name, self.fullpath, self.filehash)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'fullpath': self.fullpath,
+            'hash': self.filehash
+        }
+
 
 def create_tables(engine):
     Base.metadata.create_all(engine)

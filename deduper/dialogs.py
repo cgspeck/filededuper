@@ -23,6 +23,8 @@ class HeroImageWithList(simpledialog.Dialog):
             self.mparent = tkinter.Tk()
         else:
             self.mparent = parent
+        self.quit = False
+
 
     def window_init(self):
         tkinter.Toplevel.__init__(self, self.mparent)
@@ -97,8 +99,11 @@ class HeroImageWithList(simpledialog.Dialog):
 
         scrollbar = tkinter.Scrollbar(master, orient=tkinter.VERTICAL)
 
-        self.listbox = listbox = tkinter.Listbox(master,
-            yscrollcommand=scrollbar.set)
+        self.listbox = listbox = tkinter.Listbox(
+            master,
+            yscrollcommand=scrollbar.set,
+            selectmode=tkinter.BROWSE if self.create_symlinks else tkinter.EXTENDED
+        )
         scrollbar.config(command=listbox.yview)
         scrollbar.pack(side=tkinter.LEFT, fill=tkinter.Y)
 
@@ -134,7 +139,7 @@ class HeroImageWithList(simpledialog.Dialog):
             print(e)
 
         for item in self.data:
-            listbox.insert(tkinter.END, item['name'])
+            listbox.insert(tkinter.END, '/'.join(item['fullpath'].split('/')[-2:]))
             if item['suggest']:
                 print('set suggest flag')
                 listbox.select_set(listbox.size() - 1)
@@ -152,6 +157,11 @@ class HeroImageWithList(simpledialog.Dialog):
         '''Reset the scroll region to encompass the inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+    def set_quit(self):
+        print('Quit request registered')
+        self.quit = True
+        self.cancel()
+
     def buttonbox(self):
         self.button_box = tkinter.Frame(self)
 
@@ -160,6 +170,9 @@ class HeroImageWithList(simpledialog.Dialog):
         w.pack(side=tkinter.LEFT, padx=5, pady=5)
         w = tkinter.Button(self.button_box, text="Cancel", width=10,
             command=self.cancel)
+        w.pack(side=tkinter.LEFT, padx=5, pady=5)
+        w = tkinter.Button(self.button_box, text="Quit", width=10,
+            command=self.set_quit)
         w.pack(side=tkinter.LEFT, padx=5, pady=5)
 
         self.bind("<Return>", self.ok)
@@ -174,14 +187,16 @@ class faux_tk_dialog(object):
     mtitle = None
     _dlg = None
     _result = None
+    quit = False
 
     def __init__(self, title="File deduper"):
         self._dlg = dialog.Dialog(dialog="dialog")
         self._dlg.set_background_title(title)
 
     def window_init(self):
-        tuplelist = [('{0}'.format(num), item['name']) for num, item in
-            enumerate(self.data)]
+        tuplelist = [
+            ('{0}'.format(num), item['name']) for num, item in enumerate(self.data)
+        ]
         suggested_item = [item for item in self.data if item['suggest']][0]
         assert suggested_item
         tuplelist.insert(0, ('-1', suggested_item['name']))

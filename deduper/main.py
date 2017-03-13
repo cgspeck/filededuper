@@ -53,12 +53,6 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 
-def silly_function():
-    while True:
-        print(datetime.datetime.now())
-        time.sleep(1)
-
-
 def main():  # pragma: no cover
     setup_logging()
     signal.signal(signal.SIGINT, signal_handler)
@@ -83,8 +77,11 @@ def main():  # pragma: no cover
     parser.add_argument('folder', nargs='?', default=os.getcwd(),
         help='Folder to scan')
     parser.add_argument(
-        '--suggest_mode', choices=['longest_name', 'shortest_name'],
+        '--suggest_mode', choices=['longest_name', 'shortest_name', 'delete_path'],
         help='Mode in which to suggest files', default='shortest_name')
+    parser.add_argument(
+        '--delete_path',
+        help='Any image in this path will be deleted')
     parser.add_argument(
         '--delete', action='store_true',
         help='Do not hardlink duplicate files, just delete them')
@@ -94,15 +91,29 @@ def main():  # pragma: no cover
     if not (args.printlist or args.dedupe or args.scan):
         parser.print_help()
 
+    if args.suggest_mode == 'delete_path' and args.delete_path is None:
+        print("\n\nYou must specify a --delete_path if --suggest_mode is set to delete_path\n")
+        sys.exit(1)
+
+    if args.delete_path is not None and args.suggest_mode != 'delete_path':
+        print("\n\nDo not specify --delete_path if --suggest_mode is not set to delete_path\n")
+        sys.exit(1)
+
+    if args.suggest_mode == 'delete_path' and not args.delete:
+        print("\n\nDo not specify --delete_path if --delete is not given\n")
+        sys.exit(1)
+
     engine, session = connect_to_db(args.db)
     models.create_tables(engine)
 
     if args.printlist:
         printpopularitylist.PrintPopularityList(session,
-            print_mode=args.printlist, suggest_mode=args.suggest_mode)
+            print_mode=args.printlist, suggest_mode=args.suggest_mode
+        )
     elif args.dedupe:
         dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
-            runmode=args.dedupe, link=not(args.delete))
+            runmode=args.dedupe, link=not(args.delete), delete_path=args.delete_path
+        )
     elif args.scan:
         if os.path.isdir(args.folder):
             scanfiles.ScanFiles(session, args.folder)

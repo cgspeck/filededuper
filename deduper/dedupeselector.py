@@ -7,12 +7,13 @@ import locale
 import os
 import pprint
 import tkinter
+import sys
 
 from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
+def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_path=None):
     if runmode == 'graphical':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
@@ -22,20 +23,20 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
         dlg = dialogs.faux_tk_dialog("File deduper")
         # dialog.Dialog(dialog="dialog")
 
-    dupes = Util.get_data(session, suggest_mode=suggest_mode)
+    dupes = Util.get_data(session, suggest_mode=suggest_mode, delete_path=delete_path)
 
     for dupe in dupes:
-        assert 'keep_suggestion' in dupe
+        assert 'keep_suggestions' in dupe, 'Dupe record must have a keep_suggestions field'
+        assert len(dupe['keep_suggestions']), 'keep_suggestions must have at least one item in it'
         print('Will suggest keeping {record}'.format(
-            record=dupe['keep_suggestion']))
-        selected_keeper = None
+            record=dupe['keep_suggestions']))
+        selected_keepers = []
 
         if runmode != 'auto':
             dialog_list = []
 
             for candidate_file in dupe['files']:
-                suggest = True if (candidate_file['id'] ==
-                    dupe['keep_suggestion']['id']) else False
+                suggest = True if (candidate_file['id'] in [r['id'] for r in dupe['keep_suggestions']]) else False
 
                 dialog_list.append({
                     'name': candidate_file['name'],
@@ -43,22 +44,37 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True):
                     'fullpath': candidate_file['fullpath'],
                     'suggest': suggest})
 
+            dlg.create_symlinks = link
             dlg.data = dialog_list
-            dlg.mtitle = "Please select the file you would like to keep"
+            dlg.mtitle = "Please select the file you would like to link to" if link else "Please select the files you would like to keep"
             dlg.window_init()
 
+            if dlg.quit:
+                print('Exiting')
+                sys.exit()
+
             result = dlg.get_result()
+
             if not result:
                 print('No image selected to keep or cancel pressed')
-                break
-            selected_keeper = dupe['files'][result[0]]
+                continue
+
+            selected_keepers = list(map(lambda i: dupe['files'][i], result))
 
         elif runmode == 'auto':
-            selected_keeper = dupe['keep_suggestion']
+            selected_keepers = dupe['keep_suggestions']
 
-        assert selected_keeper is not None
-        assert os.path.exists(selected_keeper['fullpath'])
-        pprint.pprint('Will retain {0}'.format(selected_keeper))
+        assert selected_keepers is not None
+        assert len(selected_keepers) > 0
 
-        Util.handle_files(session, dupe['files'], selected_keeper,
-            dupe['hash'], link=link)
+        for fname in selected_keepers:
+            pprint.pprint('Will retain {0}'.format(fname['fullpath']))
+            assert os.path.exists(fname['fullpath'])
+
+        Util.handle_files(
+            session,
+            dupe['files'],
+            selected_keepers,
+            dupe['hash'],
+            link=link
+        )

@@ -4,6 +4,7 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
 import fudge
+import pytest
 
 import tkinter
 import os
@@ -16,12 +17,15 @@ from deduper.models import ImageFile
 
 
 @fudge.test
-def test_deduper_graphical(monkeypatch, db_session):
+def test_deduper_graphical_link(monkeypatch, db_session):
+    '''
+    Link mode allows only one file to be selected for linking
+    '''
     fake_tk_root = fudge.Fake().provides('withdraw')
     fake_Tk = fudge.Fake('Tk').expects_call().returns(fake_tk_root)
 
     first_selection = (0, )  # select first file
-    second_selection = (1, )  # select second file
+    second_selection = (1, )  # select first and second file
 
     fake_dlg_instance = (fudge.Fake('HeroImageWithListInstance')
         .provides('window_init')
@@ -29,6 +33,7 @@ def test_deduper_graphical(monkeypatch, db_session):
         .expects('get_result').returns(first_selection)
         .expects('get_result').returns(second_selection)
     )
+    fake_dlg_instance.quit = False
 
     fake_HeroImageWithList = (fudge.Fake('HeroImageWithList').expects_call()
         .with_args(fake_tk_root)
@@ -40,15 +45,15 @@ def test_deduper_graphical(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -130,12 +135,103 @@ def test_deduper_graphical(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
 
     dedupeselector.Dedupe(db_session)
+
+    # now check db
+    assert [name_[0] for name_ in db_session.query(ImageFile.name)] ==\
+        ['uniquefile', 'uniquefile2', 'thefileiwant', 'thefileiwant2']
+    assert db_session.query(ImageFile).count() == 4
+
+
+@fudge.test
+def test_deduper_graphical_delete(monkeypatch, db_session):
+    '''
+    Delete mode allows multiple files to be selected/saved
+    '''
+    fake_tk_root = fudge.Fake().provides('withdraw')
+    fake_Tk = fudge.Fake('Tk').expects_call().returns(fake_tk_root)
+
+    first_selection = (0, 2)  # select first and third file
+
+    fake_dlg_instance = (fudge.Fake('HeroImageWithListInstance')
+        .provides('window_init')
+        .remember_order()
+        .expects('get_result').returns(first_selection)
+    )
+    fake_dlg_instance.quit = False
+
+    fake_HeroImageWithList = (fudge.Fake('HeroImageWithList').expects_call()
+        .with_args(fake_tk_root)
+        .returns(fake_dlg_instance)
+    )
+
+    fake_getdata_response = [
+        {'hash': 'cf1', 'count': 3, 'files': [
+            {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
+            {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
+            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
+         }
+    ]
+
+    # 1
+    new_file = ImageFile(name='uniquefile', fullpath='/a/folder/cf1a.ext',
+                    filehash='uf1')
+    db_session.add(new_file)
+    db_session.commit()
+    # 2
+    new_file = ImageFile(name='uniquefile2', fullpath='/a/folder/cf1a.ext',
+                    filehash='uf2')
+    db_session.add(new_file)
+    db_session.commit()
+    # 3
+    new_file = ImageFile(name='thefileiwant', fullpath='/a/folder/cf1a.ext',
+                    filehash='cf1')
+    db_session.add(new_file)
+    db_session.commit()
+    # 4
+    new_file = ImageFile(name='notthefileiwant', fullpath='/a/folder/cf1a.ext',
+                    filehash='cf1')
+    db_session.add(new_file)
+    db_session.commit()
+    # 5
+    new_file = ImageFile(name='thefileiwant2', fullpath='test',
+                    filehash='cf1')
+    db_session.add(new_file)
+    db_session.commit()
+    # 6
+    new_file = ImageFile(name='thefileiwant', fullpath='test',
+                    filehash='cf1')
+    db_session.add(new_file)
+    db_session.commit()
+
+    fake_exists = (fudge.Fake('exists').expects_call()
+                    .with_args('/a/folder/cf1a.ext').returns(True)
+                    .next_call()
+                    .with_args('/a/folder/cf1cx.ext').returns(True)
+                   )
+
+    fake_remove = (fudge.Fake('remove').expects_call()
+                    .with_args('/a/folder/cf1b.ext')
+                   )
+
+    monkeypatch.setattr(dialogs, 'HeroImageWithList', fake_HeroImageWithList)
+    monkeypatch.setattr(tkinter, 'Tk', fake_Tk)
+    monkeypatch.setattr(os.path, 'exists', fake_exists)
+    monkeypatch.setattr(os, 'remove', fake_remove)
+
+    def fake_get_data(session, suggest_mode, delete_path):
+        return fake_getdata_response
+
+    monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
+
+    dedupeselector.Dedupe(db_session, link=False)
 
     # now check db
     assert [name_[0] for name_ in db_session.query(ImageFile.name)] ==\
@@ -150,15 +246,15 @@ def test_deduper_auto(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -238,7 +334,7 @@ def test_deduper_auto(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -276,15 +372,15 @@ def test_deduper_cli(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -364,7 +460,7 @@ def test_deduper_cli(monkeypatch, db_session):
     monkeypatch.setattr(os, 'remove', fake_remove)
     monkeypatch.setattr(os, 'link', fake_link)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)
@@ -384,15 +480,15 @@ def test_deduper_delete_mode(monkeypatch, db_session):
             {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
             {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
             {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
+        'keep_suggestions':
+            [{'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
             {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
             {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
             {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        'keep_suggestions':
+            [{'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}]
          }
     ]
 
@@ -461,7 +557,7 @@ def test_deduper_delete_mode(monkeypatch, db_session):
     monkeypatch.setattr(os.path, 'exists', fake_exists)
     monkeypatch.setattr(os, 'remove', fake_remove)
 
-    def fake_get_data(session, suggest_mode):
+    def fake_get_data(session, suggest_mode, delete_path):
         return fake_getdata_response
 
     monkeypatch.setattr(util.Util, 'get_data', fake_get_data)

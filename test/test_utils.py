@@ -35,24 +35,18 @@ def test_hash_file(monkeypatch):
          == Util.hash_file('/a/folder/0.ext')
 
 
-def test_get_data(db_session):
-    # returns a json dict of files with matching hashes in groups
-    unique_file_1 = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
-                    filehash='hash0')
-    unique_file_2 = ImageFile(name='1.ext', fullpath='/a/folder/1.ext',
-                    filehash='hash1')
-    common_file_1a = ImageFile(name='cf1a.ext', fullpath='/a/folder/cf1a.ext',
-                    filehash='cf1')
-    common_file_1b = ImageFile(name='cf1b.ext', fullpath='/a/folder/cf1b.ext',
-                    filehash='cf1')
-    common_file_1c = ImageFile(name='cf1cx.ext',
-        fullpath='/a/folder/cf1cx.ext', filehash='cf1')
-    common_file_2a = ImageFile(name='cf2a.ext',
-        fullpath='/a/folder/cf2a.ext', filehash='cf2')
-    common_file_2b = ImageFile(name='cf2bx.ext',
-        fullpath='/a/folder/cf2bx.ext', filehash='cf2')
-    common_file_2c = ImageFile(name='cf2c.ext', fullpath='/a/folder/cf2c.ext',
-                    filehash='cf2')
+def test_get_data_longest_filename(db_session):
+    '''
+    This will suggest for retention the file record with the longest _filename_
+    '''
+    unique_file_1 = ImageFile(id=1, name='0.ext', fullpath='/a/folder/0.ext', filehash='hash0')
+    unique_file_2 = ImageFile(id=2, name='1.ext', fullpath='/a/folder/1.ext', filehash='hash1')
+    common_file_1a = ImageFile(id=3, name='cf1a.ext', fullpath='/a/folder/cf1a.ext', filehash='cf1')
+    common_file_1b = ImageFile(id=4, name='cf1b.ext', fullpath='/a/folder/cf1b.ext', filehash='cf1')
+    common_file_1c = ImageFile(id=5, name='cf1cx.ext', fullpath='/a/folder/cf1cx.ext', filehash='cf1')
+    common_file_2a = ImageFile(id=6, name='cf2a.ext', fullpath='/a/folder/cf2a.ext', filehash='cf2')
+    common_file_2b = ImageFile(id=7, name='cf2bx.ext', fullpath='/a/folder/cf2bx.ext', filehash='cf2')
+    common_file_2c = ImageFile(id=8, name='cf2c.ext', fullpath='/a/folder/cf2c.ext', filehash='cf2')
     db_session.add(unique_file_1)
     db_session.add(unique_file_2)
     db_session.add(common_file_1a)
@@ -64,47 +58,112 @@ def test_get_data(db_session):
     db_session.commit()
 
     expected = [
-        {'hash': 'cf1', 'count': 3, 'files': [
-            {'name': 'cf1a.ext', 'fullpath': '/a/folder/cf1a.ext', 'id': 3},
-            {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}
-         },
-        {'hash': 'cf2', 'count': 3, 'files': [
-            {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7},
-            {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2bx.ext', 'fullpath': '/a/folder/cf2bx.ext', 'id': 7}
+        {
+            'hash': 'cf1', 'count': 3, 'files': [
+                common_file_1a.to_dict(),
+                common_file_1b.to_dict(),
+                common_file_1c.to_dict(),
+            ],
+            'keep_suggestions': [
+                common_file_1c.to_dict(),
+            ]
+        },
+        {
+            'hash': 'cf2', 'count': 3, 'files': [
+                common_file_2a.to_dict(),
+                common_file_2b.to_dict(),
+                common_file_2c.to_dict(),
+            ],
+            'keep_suggestions': [
+                common_file_2b.to_dict(),
+            ]
          }
     ]
 
-    actual = Util.get_data(db_session)
+    actual = Util.get_data(db_session, suggest_mode='longest_name')
 
     assert expected == actual
 
 
 def test_get_data_shortest(db_session):
-    # returns a json dict of files with matching hashes in groups
-    unique_file_1 = ImageFile(name='0.ext', fullpath='/a/folder/0.ext',
-                    filehash='hash0')
-    unique_file_2 = ImageFile(name='1.ext', fullpath='/a/folder/1.ext',
-                    filehash='hash1')
-    common_file_1a = ImageFile(name='cf1.ext', fullpath='/a/folder/cf1.ext',
-                    filehash='cf1')
-    common_file_1b = ImageFile(name='cf1b.ext', fullpath='/a/folder/cf1b.ext',
-                    filehash='cf1')
-    common_file_1c = ImageFile(name='cf1cx.ext',
-        fullpath='/a/folder/cf1cx.ext', filehash='cf1')
-    common_file_2a = ImageFile(name='cf2a.ext',
-        fullpath='/a/folder/cf2a.ext', filehash='cf2')
-    common_file_2b = ImageFile(name='cf2.ext',
-        fullpath='/a/folder/cf2.ext', filehash='cf2')
-    common_file_2c = ImageFile(name='cf2c.ext', fullpath='/a/folder/cf2c.ext',
-                    filehash='cf2')
-    db_session.add(unique_file_1)
-    db_session.add(unique_file_2)
+    '''
+    This will suggest for retention the file record with the shortest _filename_
+    '''
+    common_file_1a = ImageFile(
+        name='cf1.ext', fullpath='/a/folder/cf1.ext', filehash='cf1', id=1
+    )
+    common_file_1b = ImageFile(
+        name='cf1b.ext', fullpath='/b/folder/cf1b.ext', filehash='cf1', id=2
+    )
+    common_file_1c = ImageFile(
+        name='cf1cx.ext', fullpath='/c/folder/cf1cx.ext', filehash='cf1', id=3
+    )
+    common_file_2a = ImageFile(
+        name='cf2.ext', fullpath='/a/folder/cf2.ext', filehash='cf2', id=4
+    )
+    common_file_2b = ImageFile(
+        name='cf2b.ext', fullpath='/b/folder/cf2b.ext', filehash='cf2', id=5
+    )
+    common_file_2c = ImageFile(
+        name='cf2c.ext', fullpath='/c/folder/cf2c.ext', filehash='cf2', id=6
+    )
+    db_session.add(common_file_1a)
+    db_session.add(common_file_1b)
+    db_session.add(common_file_1c)
+    db_session.add(common_file_2a)
+    db_session.add(common_file_2b)
+    db_session.add(common_file_2c)
+    db_session.commit()
+
+    expected = [
+        {
+            'hash': 'cf1', 'count': 3, 'files': [
+                common_file_1a.to_dict(),
+                common_file_1b.to_dict(),
+                common_file_1c.to_dict(),
+            ],
+            'keep_suggestions': [
+                common_file_1a.to_dict(),
+            ]
+        },
+        {
+        'hash': 'cf2', 'count': 3, 'files': [
+            common_file_2a.to_dict(),
+            common_file_2b.to_dict(),
+            common_file_2c.to_dict(),
+        ],
+        'keep_suggestions': [
+            common_file_2a.to_dict(),
+        ]
+         }
+    ]
+
+    actual = Util.get_data(db_session, suggest_mode='shortest_name')
+
+    assert expected == actual
+
+def test_get_data_with_deletepath(db_session):
+    '''
+    This will suggest for retention any file that isn't within delete_path
+    '''
+    common_file_1a = ImageFile(
+        name='cf1.ext', fullpath='/a/folder/cf1.ext', filehash='cf1', id=1
+    )
+    common_file_1b = ImageFile(
+        name='cf1b.ext', fullpath='/b/folder/cf1b.ext', filehash='cf1', id=2
+    )
+    common_file_1c = ImageFile(
+        name='cf1cx.ext', fullpath='/c/folder/cf1cx.ext', filehash='cf1', id=3
+    )
+    common_file_2a = ImageFile(
+        name='cf2a.ext', fullpath='/a/folder/cf2a.ext', filehash='cf2', id=4
+    )
+    common_file_2b = ImageFile(
+        name='cf2b.ext', fullpath='/b/folder/cf2b.ext', filehash='cf2', id=5
+    )
+    common_file_2c = ImageFile(
+        name='cf2c.ext', fullpath='/c/folder/cf2c.ext', filehash='cf2', id=6
+    )
     db_session.add(common_file_1a)
     db_session.add(common_file_1b)
     db_session.add(common_file_1c)
@@ -115,21 +174,29 @@ def test_get_data_shortest(db_session):
 
     expected = [
         {'hash': 'cf1', 'count': 3, 'files': [
-            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3},
-            {'name': 'cf1b.ext', 'fullpath': '/a/folder/cf1b.ext', 'id': 4},
-            {'name': 'cf1cx.ext', 'fullpath': '/a/folder/cf1cx.ext', 'id': 5}],
-        'keep_suggestion':
-            {'name': 'cf1.ext', 'fullpath': '/a/folder/cf1.ext', 'id': 3}
+            common_file_1a.to_dict(),
+            common_file_1b.to_dict(),
+            common_file_1c.to_dict(),
+        ],
+        'keep_suggestions':
+            [
+                common_file_1a.to_dict(),
+                common_file_1c.to_dict(),
+            ]
          },
         {'hash': 'cf2', 'count': 3, 'files': [
-            {'name': 'cf2a.ext', 'fullpath': '/a/folder/cf2a.ext', 'id': 6},
-            {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7},
-            {'name': 'cf2c.ext', 'fullpath': '/a/folder/cf2c.ext', 'id': 8}],
-        'keep_suggestion':
-            {'name': 'cf2.ext', 'fullpath': '/a/folder/cf2.ext', 'id': 7}
+            common_file_2a.to_dict(),
+            common_file_2b.to_dict(),
+            common_file_2c.to_dict(),
+        ],
+        'keep_suggestions':
+            [
+                common_file_2a.to_dict(),
+                common_file_2c.to_dict(),
+            ]
          }
     ]
 
-    actual = Util.get_data(db_session, suggest_mode='shortest_name')
+    actual = Util.get_data(db_session, suggest_mode='delete_path', delete_path='/b')
 
     assert expected == actual
