@@ -5,8 +5,6 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE file.
 import argparse
-import datetime
-import time
 import signal
 import logging
 import sys
@@ -109,11 +107,10 @@ def main():  # pragma: no cover
     if args.printlist:
         printpopularitylist.PrintPopularityList(session,
             print_mode=args.printlist, suggest_mode=args.suggest_mode
-        )
+                                                )
     elif args.dedupe:
         dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
-            runmode=args.dedupe, link=not(args.delete), delete_path=args.delete_path
-        )
+            runmode=args.dedupe, link=not(args.delete), delete_path=args.delete_path)
     elif args.scan:
         if os.path.isdir(args.folder):
             scanfiles.ScanFiles(session, args.folder)

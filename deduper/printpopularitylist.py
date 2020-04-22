@@ -16,5 +16,5 @@ def PrintPopularityList(session, print_mode='csv', suggest_mode=None, **kwargs):
             print("{count}, {name}".format(count=result['count'],
                 name=result['keep_suggestion']['name']))
     else:
-            # pretty print the json objects
-            pprint.pprint(results)
+        # pretty print the json objects
+        pprint.pprint(results)

@@ -11,6 +11,6 @@ setup(name='FileDeduper',
     scripts=['scripts/deduper'],
     install_requires=['pythondialog', 'sqlalchemy', 'pillow'],
     extras_require={
-    'tests': ['pytest', 'fudge', 'flake8']
+        'tests': ['pytest', 'fudge', 'flake8']
     }
-      )
+)

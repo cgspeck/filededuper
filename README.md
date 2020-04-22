@@ -61,8 +61,10 @@ and changing the working database).
 
 ## Running the tests
 
-Check out the repo then::
+Check out the repo then:
 
+```
 pip install -e .[tests]
 py.test
 flake8
+```
