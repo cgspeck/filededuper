@@ -13,8 +13,8 @@ from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_path=None):
-    if runmode == 'graphical':
+def Dedupe(session, suggest_mode=None, runmode='gui', link=True, delete_path=None):
+    if runmode == 'gui':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
         dlg = dialogs.HeroImageWithList(tk_root)
@@ -59,7 +59,7 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_pa
                 print('No image selected to keep or cancel pressed')
                 continue
 
-            selected_keepers = list(map(lambda i: dupe['files'][i], result))
+            selected_keepers = list([dupe['files'][i] for i in result])
 
         elif runmode == 'auto':
             selected_keepers = dupe['keep_suggestions']

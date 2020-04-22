@@ -1,11 +1,5 @@
-# This file is part of the File Deduper project. It is subject to
-# the the revised 3-clause BSD license terms as set out in the LICENSE
-# file found in the top-level directory of this distribution. No part of this
-# project, including this file, may be copied, modified, propagated, or
-# distributed except according to the terms contained in the LICENSE fileself.
 import tkinter
 from tkinter import simpledialog
-
 from PIL import Image, ImageTk
 import dialog
 
@@ -24,7 +18,6 @@ class HeroImageWithList(simpledialog.Dialog):
         else:
             self.mparent = parent
         self.quit = False
-
 
     def window_init(self):
         tkinter.Toplevel.__init__(self, self.mparent)
@@ -55,11 +48,11 @@ class HeroImageWithList(simpledialog.Dialog):
         self.buttonbox()
         screen_height = self.parent.winfo_screenheight()
         max_height = screen_height * 0.9
-        self.initial_focus = self.body(body,
-            max_height=(max_height -
-            self.button_box.winfo_reqheight()
-            - 50),  # title bar
-            max_width=self.parent.winfo_screenwidth())
+        self.initial_focus = self.body(
+            body,
+            max_height=(max_height - self.button_box.winfo_reqheight() - 50),  # title bar
+            max_width=self.parent.winfo_screenwidth()
+        )
 
         self.grab_set()
 
@@ -118,16 +111,13 @@ class HeroImageWithList(simpledialog.Dialog):
                 if max_width < max_height:
                     # width is the limiter
                     desired_width = int(max_width)
-                    desired_height = int(original_y *
-                        (desired_width / original_x))
+                    desired_height = int(original_y * (desired_width / original_x))
                 else:
                     # height is the limiter
                     desired_height = int(max_height)
-                    desired_width = int(original_x *
-                        (desired_height / original_y))
+                    desired_width = int(original_x * (desired_height / original_y))
                 self._resized_image = ImageTk.PhotoImage(
-                    self._original_image_pil.resize((desired_width,
-                        desired_height)))
+                    self._original_image_pil.resize((desired_width, desired_height)))
             else:
                 self._resized_image = ImageTk.PhotoImage(
                     self._original_image_pil)

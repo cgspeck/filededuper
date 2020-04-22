@@ -4,11 +4,11 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE fileself.
 from copy import copy
-from pprint import pprint
 import hashlib
 import os
 
 from sqlalchemy.sql import func
+from sqlalchemy import text
 
 from . import models
 
@@ -79,8 +79,8 @@ class Util(object):
 
         for filehash, count in session.query(models.ImageFile.filehash,
                 func.count('*').label('hash_count'))\
-                .group_by(models.ImageFile.filehash).having(func.count('*')
-                    > 1).order_by('hash_count desc'):
+                .group_by(models.ImageFile.filehash).having(
+                    func.count('*') > 1).order_by(text('hash_count desc')):
             qry = session.query(models.ImageFile.id, models.ImageFile.name,
                 models.ImageFile.fullpath, models.ImageFile.filehash,
                 func.char_length(models.ImageFile.name).label('namelen'))\
@@ -129,8 +129,7 @@ class Util(object):
         session.query(models.ImageFile) \
             .filter(
                 models.ImageFile.filehash == hash_,
-                models.ImageFile.id.notin_(selected_ids)
-            ) \
+                models.ImageFile.id.notin_(selected_ids)) \
             .delete(synchronize_session='fetch')
 
         session.commit()

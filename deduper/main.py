@@ -5,8 +5,6 @@
 # project, including this file, may be copied, modified, propagated, or
 # distributed except according to the terms contained in the LICENSE file.
 import argparse
-import datetime
-import time
 import signal
 import logging
 import sys
@@ -70,7 +68,7 @@ def main():  # pragma: no cover
         '--printlist', '-p', choices=['csv', 'json'],
         help='Print duplicate count, suggestion (csv) and file list (json)')
     function_group.add_argument(
-        '--dedupe', '-d', choices=['auto', 'graphical', 'cli'],
+        '--dedupe', '-d', choices=['auto', 'gui', 'cli'],
         help='Interactively prompt to delete duplicate files')
     parser.add_argument('--db', default=default_db,
         help='Database URI, e.g. {0}'.format(default_db))
@@ -109,11 +107,10 @@ def main():  # pragma: no cover
     if args.printlist:
         printpopularitylist.PrintPopularityList(session,
             print_mode=args.printlist, suggest_mode=args.suggest_mode
-        )
+                                                )
     elif args.dedupe:
         dedupeselector.Dedupe(session, suggest_mode=args.suggest_mode,
-            runmode=args.dedupe, link=not(args.delete), delete_path=args.delete_path
-        )
+            runmode=args.dedupe, link=not(args.delete), delete_path=args.delete_path)
     elif args.scan:
         if os.path.isdir(args.folder):
             scanfiles.ScanFiles(session, args.folder)

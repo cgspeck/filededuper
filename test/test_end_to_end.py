@@ -52,7 +52,7 @@ def test_auto_delete_remove_path(db_session, fileset):
         delete_path=delete_path
     )
 
-    for category, sf_list in fileset['collections'].items():
+    for category, sf_list in list(fileset['collections'].items()):
         for sf in sf_list:
             if sf.fullpath.startswith(delete_path):
                 assert not sf.exists()
