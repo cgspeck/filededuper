@@ -13,8 +13,8 @@ from . import dialogs
 from .util import Util
 
 
-def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_path=None):
-    if runmode == 'graphical':
+def Dedupe(session, suggest_mode=None, runmode='gui', link=True, delete_path=None):
+    if runmode == 'gui':
         tk_root = tkinter.Tk()
         tk_root.withdraw()
         dlg = dialogs.HeroImageWithList(tk_root)

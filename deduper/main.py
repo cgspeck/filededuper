@@ -68,7 +68,7 @@ def main():  # pragma: no cover
         '--printlist', '-p', choices=['csv', 'json'],
         help='Print duplicate count, suggestion (csv) and file list (json)')
     function_group.add_argument(
-        '--dedupe', '-d', choices=['auto', 'graphical', 'cli'],
+        '--dedupe', '-d', choices=['auto', 'gui', 'cli'],
         help='Interactively prompt to delete duplicate files')
     parser.add_argument('--db', default=default_db,
         help='Database URI, e.g. {0}'.format(default_db))

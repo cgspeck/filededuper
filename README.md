@@ -7,7 +7,7 @@ and then help you deduplicate them by hardlinking or removing the duplicates.
 
 When deduping, it has three modes of running:-
 
-- graphical: if an image, try to display it along with a list of identical files
+- gui: if an image, try to display it along with a list of identical files
 - console: displays a cursors dialog with matching files
 - auto: will hardlink or delete duplicate files without prompt
 
@@ -49,7 +49,7 @@ deduper -s
 To remove files::
 
 ```
-deduper -d graphical (will display images)
+deduper -d gui (will display images)
 deduper -d cli (will give you a cursors dialog)
 deduper -d auto (will choose for you)
 ```

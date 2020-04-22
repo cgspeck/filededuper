@@ -9,12 +9,12 @@ from .util import Util
 
 
 def PrintPopularityList(session, print_mode='csv', suggest_mode=None, **kwargs):
-    results = Util.get_data(session)
+    results = Util.get_data(session, suggest_mode=suggest_mode)
     if print_mode == 'csv':
         for result in results:
             # print row by row COUNT, SUGGESTION_TO_KEEP
             print("{count}, {name}".format(count=result['count'],
-                name=result['keep_suggestion']['name']))
+                name=result['keep_suggestions'][0]['fullpath']))
     else:
         # pretty print the json objects
         pprint.pprint(results)
