@@ -9,6 +9,7 @@ import hashlib
 import os
 
 from sqlalchemy.sql import func
+from sqlalchemy import text
 
 from . import models
 
@@ -80,7 +81,7 @@ class Util(object):
         for filehash, count in session.query(models.ImageFile.filehash,
                 func.count('*').label('hash_count'))\
                 .group_by(models.ImageFile.filehash).having(func.count('*')
-                    > 1).order_by('hash_count desc'):
+                    > 1).order_by(text('hash_count desc')):
             qry = session.query(models.ImageFile.id, models.ImageFile.name,
                 models.ImageFile.fullpath, models.ImageFile.filehash,
                 func.char_length(models.ImageFile.name).label('namelen'))\
