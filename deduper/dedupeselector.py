@@ -59,7 +59,7 @@ def Dedupe(session, suggest_mode=None, runmode='graphical', link=True, delete_pa
                 print('No image selected to keep or cancel pressed')
                 continue
 
-            selected_keepers = list(map(lambda i: dupe['files'][i], result))
+            selected_keepers = list([dupe['files'][i] for i in result])
 
         elif runmode == 'auto':
             selected_keepers = dupe['keep_suggestions']
